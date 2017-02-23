@@ -1,5 +1,5 @@
 {
-  "PrivateKeyPath": "/Users/trevorprater/go/src/github.com/trevorprater/youfie-api-2/settings/keys/private_key",
-  "PublicKeyPath": "/Users/trevorprater/go/src/github.com/trevorprater/youfie-api-2/settings/keys/public_key.pub",
+  "PrivateKeyPath": "/src/github.com/trevorprater/youfie-api-2/settings/keys/private_key",
+  "PublicKeyPath": "/src/github.com/trevorprater/youfie-api-2/settings/keys/public_key.pub",
   "JWTExpirationDelta": 72
 }

@@ -106,7 +106,7 @@ func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 }
 
 func getPrivateKey() *rsa.PrivateKey {
-	privateKeyFile, err := os.Open(settings.Get().PrivateKeyPath)
+	privateKeyFile, err := os.Open(os.Getenv("GOPATH") + settings.Get().PrivateKeyPath)
 	if err != nil {
 		panic(err)
 	}
@@ -132,7 +132,7 @@ func getPrivateKey() *rsa.PrivateKey {
 }
 
 func getPublicKey() *rsa.PublicKey {
-	publicKeyFile, err := os.Open(settings.Get().PublicKeyPath)
+	publicKeyFile, err := os.Open(os.Getenv("GOPATH") + settings.Get().PublicKeyPath)
 	if err != nil {
 		panic(err)
 	}
