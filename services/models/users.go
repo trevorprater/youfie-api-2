@@ -1,13 +1,14 @@
 package models
 
 import (
-	"errors"
 	"log"
 	"time"
+	"net/http"
+	"encoding/json"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pborman/uuid"
 	"github.com/trevorprater/youfie-api-2/core/etc"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -35,20 +36,41 @@ func GetUserByID(id string, db sqlx.Ext) (*User, error) {
 	return &user, err
 }
 
-func (u *User) create(db sqlx.Ext) error {
-	if uuid.Parse(u.ID) == nil {
-		return errors.New("Invalid User ID")
+func (user *User) create(db sqlx.Ext) error {
+	pwHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	if err != nil {
+		log.Println("could not generate a hash from the password!")
+		return err
 	}
+	user.PasswordHash = string(pwHash)
 
-	_, err := sqlx.NamedExec(db, `
+	_, err = sqlx.NamedExec(db, `
 		INSERT INTO users
-		(id, email, display_name, pw_key)
-		VALUES (:id, :email, :display_name, :pw_key)`, u)
+		(email, display_name, hash)
+		VALUES (:email, :display_name, :hash)`, user)
+
+	return err
+}
+
+func (u *User) InsertUser(db sqlx.Ext) (int, []byte) {
+	err := u.create(db)
 
 	// unique constraint violated
 	if etc.Duperr(err) {
-		log.Printf("Failed to create user %v: %v", u.Email, err.Error())
+		log.Printf("User already exists %v: %v", u.Email, err.Error())
+		return http.StatusConflict, []byte("")
 	}
 
-	return err
+	if err != nil {
+		log.Println(err)
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	response, err := json.MarshalIndent(&u, "", "    ")
+	if err != nil {
+		log.Println(err)
+		return http.StatusInternalServerError, []byte("")
+	}
+
+	return http.StatusCreated, response
 }
