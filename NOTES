@@ -73,7 +73,7 @@ https://youfie.io/api/v1/<user_id>/matches/<match_id>?confirmed=true|false {GET,
         - `match_id` is required
         - deletes a match (confirmed match or possible match)
 
-https://youfie.io/api/v1/messages/<user_id> {GET, POST, DELETE}
+https://youfie.io/api/v1/conversations/<user_id> {GET, POST, DELETE}
     - curl -XGET -H "Authorization: Bearer <JWT>"
         - if `user_id` is present, returns a paginated list of messages between the current user and `user_id`.
         - if `user_id` is not supplied, returns a paginated list of metadata for each conversation the current user owns.
@@ -85,11 +85,6 @@ https://youfie.io/api/v1/messages/<user_id> {GET, POST, DELETE}
     - curl -XDELETE -H "Authorization: Bearer <JWT>"
         - `user_id` is required
         - deletes all messages between the current user and `user_id`.
-
-https://youfie.io/api/v1/messages/<message_id> {DELETE}
-    - curl -XDELETE -H "Authorization: Bearer <JWT>"
-        - `message_id` is required
-        - deletes a message owned by the current user
 
 TODO:
     - VOUCH PROTOCOL
