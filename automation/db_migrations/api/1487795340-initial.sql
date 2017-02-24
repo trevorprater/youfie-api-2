@@ -12,10 +12,11 @@ CREATE TABLE users (
     admin BOOLEAN DEFAULT false,
 
     disabled BOOLEAN DEFAULT false,
-    disabled_until TIMESTAMP DEFAULT current_timestamp,
+    disabled_until TIMESTAMPTZ DEFAULT current_timestamp,
 
-    created_at TIMESTAMP DEFAULT current_timestamp,
-    updated_at TIMESTAMP DEFAULT current_timestamp,
+    last_login TIMESTAMPTZ DEFAULT current_timestamp,
+    created_at TIMESTAMPTZ DEFAULT current_timestamp,
+    updated_at TIMESTAMPTZ DEFAULT current_timestamp,
 
     UNIQUE(email, display_name)
 );

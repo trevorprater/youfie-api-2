@@ -20,6 +20,7 @@ type User struct {
 	Admin         bool      `json:"-" form:"-" db:"admin"`
 	Disabled      bool      `json:"-" form:"-" db:"disabled"`
 	DisabledUntil time.Time `json:"disabled_until" form:"disabled_until" db:"disabled_until"`
+	LastLogin     time.Time `json:"last_login" form:"-" db:"last_login"`
 	CreatedAt     time.Time `json:"created_at" form:"created_at" db:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`
 }
@@ -36,18 +37,18 @@ func GetUserByID(id string, db sqlx.Ext) (*User, error) {
 	return &user, err
 }
 
-func (user *User) create(db sqlx.Ext) error {
-	pwHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+func (u *User) create(db sqlx.Ext) error {
+	pwHash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
 	if err != nil {
 		log.Println("could not generate a hash from the password!")
 		return err
 	}
-	user.PasswordHash = string(pwHash)
+	u.PasswordHash = string(pwHash)
 
 	_, err = sqlx.NamedExec(db, `
 		INSERT INTO users
 		(email, display_name, hash)
-		VALUES (:email, :display_name, :hash)`, user)
+		VALUES (:email, :display_name, :hash)`, u)
 
 	return err
 }
@@ -73,4 +74,13 @@ func (u *User) InsertUser(db sqlx.Ext) (int, []byte) {
 	}
 
 	return http.StatusCreated, response
+}
+
+func (u *User) UpdateLastLogin(db sqlx.Ext) error {
+	_, err := sqlx.NamedExec(db, `
+		UPDATE users SET last_login = current_timestamp WHERE email = :email`, u)
+	if err != nil {
+		log.Println("could not update last login for user")
+	}
+	return err
 }

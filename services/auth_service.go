@@ -6,6 +6,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
+	"github.com/trevorprater/youfie-api-2/core/postgres"
 	"github.com/trevorprater/youfie-api-2/api/parameters"
 	"github.com/trevorprater/youfie-api-2/core/authentication"
 	"github.com/trevorprater/youfie-api-2/services/models"
@@ -20,6 +21,7 @@ func Login(requestUser *models.User) (int, []byte) {
 			return http.StatusInternalServerError, []byte(err.Error())
 		} else {
 			response, _ := json.Marshal(parameters.TokenAuthentication{token})
+			requestUser.UpdateLastLogin(postgres.DB())
 			return http.StatusOK, response
 		}
 	}

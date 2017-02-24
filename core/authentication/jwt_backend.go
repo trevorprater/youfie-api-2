@@ -54,12 +54,6 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userUUID string) (string,
 }
 
 func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) bool {
-	//hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-	//if err != nil {
-	//	log.Println("Cannot generate hash from user's password!")
-	//	return false
-	//}
-
 	dbUser, err := models.GetUserByEmail(user.Email, postgres.DB())
 	if err != nil {
 		log.Printf("Cannot get user by email: %v, error: %v", user.Email, err.Error())
