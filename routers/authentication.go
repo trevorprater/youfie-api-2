@@ -13,11 +13,11 @@ func SetAuthenticationRoutes(router *mux.Router) *mux.Router {
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.RefreshToken),
-		)).Methods("GET")
+		)).Methods("POST")
 	router.Handle("/auth/logout",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.Logout),
-		)).Methods("GET")
+		)).Methods("POST")
 	return router
 }
