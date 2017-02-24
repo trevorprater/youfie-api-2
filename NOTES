@@ -46,7 +46,7 @@ https://youfie.io/api/v1/users/<user_id>/photos/<photo_id> {GET, POST, DELETE}
         -> deletes a photo owned by the user
         -> `photo_id` required
 
-https://youfie.io/api/v1/users/<user_id>/photos/<photo_id>/faces/<face_id> {GET, PUT, DELETE}
+https://youfie.io/api/v1/users/<user_id>/photos/<photo_id>/faces/<face_id> {GET, POST, DELETE}
 
     -curl -XGET -H "Authorization: Bearer <JWT>"
         -> retrieves a list of all faces found within a photo: `[known_user_id, [possible matched user_ids], top_left_corner_x, top_left_corner_y, bottom_right_corner_x, bottom_right_corner_y]`
