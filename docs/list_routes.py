@@ -1,9 +1,12 @@
 import os
+from pprint import pprint
 
-for f in os.listdir('../routers'):
+PATH = os.getenv("GOPATH") + '/src/github.com/trevorprater/youfie-api-2/routers/'
+for f in os.listdir(PATH):
     routes = []
     methods = []
-    with open('../routers/' + f) as ff:
+    with open(PATH + f) as ff:
+        data = []
         route = methods = ''
         for line in ff.readlines():
             if 'router.Handle(' in line or 'router.HandleFunc(' in line:
@@ -13,5 +16,11 @@ for f in os.listdir('../routers'):
                 methods = line.split('Methods(')[-1].replace(')', '').replace(
                     '"', '').strip()
             if not route == '' and not methods == '':
-                print 'endpoint: {},  methods: {}'.format(route, methods)
+                data.append('endpoint: {},  methods: {}'.format(route, methods))
                 route = methods = ''
+        if data:
+            print f
+            print '=' * 50
+            for row in data:
+                print row
+    print '\n'
