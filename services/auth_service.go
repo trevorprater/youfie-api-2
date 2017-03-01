@@ -6,9 +6,9 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	request "github.com/dgrijalva/jwt-go/request"
-	"github.com/trevorprater/youfie-api-2/core/postgres"
 	"github.com/trevorprater/youfie-api-2/api/parameters"
 	"github.com/trevorprater/youfie-api-2/core/authentication"
+	"github.com/trevorprater/youfie-api-2/core/postgres"
 	"github.com/trevorprater/youfie-api-2/services/models"
 )
 
@@ -29,9 +29,9 @@ func Login(requestUser *models.User) (int, []byte) {
 	return http.StatusUnauthorized, []byte("")
 }
 
-func RefreshToken(requestUser *models.User) []byte {
+func RefreshToken(userID string) []byte {
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	token, err := authBackend.GenerateToken(requestUser.ID)
+	token, err := authBackend.GenerateToken(userID)
 	if err != nil {
 		panic(err)
 	}

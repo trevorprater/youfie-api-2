@@ -1,15 +1,16 @@
 package unit_tests
 
 import (
-	"api.jwt.auth/core/authentication"
-	"api.jwt.auth/core/redis"
-	"api.jwt.auth/services/models"
-	"api.jwt.auth/settings"
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/stretchr/testify/assert"
-	. "gopkg.in/check.v1"
 	"os"
 	"testing"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/trevorprater/youfie-api-2/core/authentication"
+	"github.com/trevorprater/youfie-api-2/core/redis"
+	"github.com/trevorprater/youfie-api-2/services/models"
+	"github.com/trevorprater/youfie-api-2/settings"
+	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) {
@@ -50,7 +51,7 @@ func (suite *AuthenticationBackendTestSuite) TestGenerateToken(c *C) {
 func (suite *AuthenticationBackendTestSuite) TestAuthenticate(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 	user := &models.User{
-		Username: "haku",
+		Email:    "haku@youfie.io",
 		Password: "testing",
 	}
 	c.Assert(authBackend.Authenticate(user), Equals, true)
@@ -59,16 +60,16 @@ func (suite *AuthenticationBackendTestSuite) TestAuthenticate(c *C) {
 func (suite *AuthenticationBackendTestSuite) TestAuthenticateIncorrectPass(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 	user := models.User{
-		Username: "haku",
+		Email:    "haku@youfie.io",
 		Password: "Password",
 	}
 	c.Assert(authBackend.Authenticate(&user), Equals, false)
 }
 
-func (suite *AuthenticationBackendTestSuite) TestAuthenticateIncorrectUsername(c *C) {
+func (suite *AuthenticationBackendTestSuite) TestAuthenticateIncorrectEmail(c *C) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 	user := &models.User{
-		Username: "Haku",
+		Email:    "Haku@youfie.io",
 		Password: "testing",
 	}
 	c.Assert(authBackend.Authenticate(user), Equals, false)

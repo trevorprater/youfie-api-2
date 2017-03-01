@@ -25,7 +25,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	decoder.Decode(&requestUser)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(services.RefreshToken(requestUser))
+	w.Write(services.RefreshToken(requestUser.ID))
 }
 
 func Logout(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

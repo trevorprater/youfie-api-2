@@ -1,18 +1,19 @@
 package api_tests
 
 import (
-	"api.jwt.auth/core/authentication"
-	"api.jwt.auth/routers"
-	"api.jwt.auth/services"
-	"api.jwt.auth/settings"
 	"fmt"
-	"github.com/codegangsta/negroni"
-	"github.com/stretchr/testify/assert"
-	. "gopkg.in/check.v1"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/codegangsta/negroni"
+	"github.com/stretchr/testify/assert"
+	"github.com/trevorprater/youfie-api-2/core/authentication"
+	"github.com/trevorprater/youfie-api-2/routers"
+	"github.com/trevorprater/youfie-api-2/services"
+	"github.com/trevorprater/youfie-api-2/settings"
+	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) {

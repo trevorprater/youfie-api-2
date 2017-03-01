@@ -1,15 +1,18 @@
 package unit_tests
 
 import (
-	"api.jwt.auth/services"
-	"api.jwt.auth/services/models"
-	"api.jwt.auth/settings"
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/stretchr/testify/assert"
-	. "gopkg.in/check.v1"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/trevorprater/youfie-api-2/core/authentication"
+	"github.com/trevorprater/youfie-api-2/services"
+	"github.com/trevorprater/youfie-api-2/services/models"
+	"github.com/trevorprater/youfie-api-2/settings"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/assert"
+	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) {
@@ -19,6 +22,7 @@ func Test(t *testing.T) {
 type AuthenticationServicesTestSuite struct{}
 
 var _ = Suite(&AuthenticationServicesTestSuite{})
+
 var t *testing.T
 
 func (s *AuthenticationServicesTestSuite) SetUpSuite(c *C) {
@@ -28,7 +32,7 @@ func (s *AuthenticationServicesTestSuite) SetUpSuite(c *C) {
 
 func (suite *AuthenticationServicesTestSuite) TestLogin(c *C) {
 	user := models.User{
-		Username: "haku",
+		Email:    "haku@youfie.io",
 		Password: "testing",
 	}
 	response, token := services.Login(&user)
@@ -38,7 +42,7 @@ func (suite *AuthenticationServicesTestSuite) TestLogin(c *C) {
 
 func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectPassword(c *C) {
 	user := models.User{
-		Username: "haku",
+		Email:    "haku@youfie.io",
 		Password: "Password",
 	}
 	response, token := services.Login(&user)
@@ -46,9 +50,9 @@ func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectPassword(c *C) {
 	assert.Empty(t, token)
 }
 
-func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectUsername(c *C) {
+func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectEmail(c *C) {
 	user := models.User{
-		Username: "Username",
+		Email:    "Username@youfie.io",
 		Password: "testing",
 	}
 	response, token := services.Login(&user)
@@ -58,7 +62,7 @@ func (suite *AuthenticationServicesTestSuite) TestLoginIncorrectUsername(c *C) {
 
 func (suite *AuthenticationServicesTestSuite) TestLoginEmptyCredentials(c *C) {
 	user := models.User{
-		Username: "",
+		Email:    "",
 		Password: "",
 	}
 	response, token := services.Login(&user)
@@ -68,11 +72,11 @@ func (suite *AuthenticationServicesTestSuite) TestLoginEmptyCredentials(c *C) {
 
 func (suite *AuthenticationServicesTestSuite) TestRefreshToken(c *C) {
 	user := models.User{
-		Username: "haku",
+		Email:    "haku@youfie.io",
 		Password: "testing",
 	}
 	authBackend := authentication.InitJWTAuthenticationBackend()
-	tokenString, err := authBackend.GenerateToken(user.UUID)
+	tokenString, err := authBackend.GenerateToken(user.ID)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return authBackend.PublicKey, nil
 	})
@@ -90,7 +94,7 @@ func (suite *AuthenticationServicesTestSuite) TestRefreshTokenInvalidToken(c *C)
 
 func (suite *AuthenticationServicesTestSuite) TestLogout(c *C) {
 	user := models.User{
-		Username: "haku",
+		Email:    "haku@youfie.io",
 		Password: "testing",
 	}
 	authBackend := auth.InitJWTAuthenticationBackend()
