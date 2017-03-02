@@ -13,14 +13,14 @@ import (
 	"github.com/trevorprater/youfie-api-2/services/models"
 )
 
-func GetUserByDisplayName(w http.ResponseWriter, r *http.Request) {
+func GetUserByDisplayName(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	vars := mux.Vars(r)
 	user, err := models.GetUserByDisplayName(vars["display_name"], postgres.DB())
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusNotFound)
 	}
-	userJson, err := json.MarshalIndent(&u, "", "    ")
+	userJson, err := json.MarshalIndent(&user, "", "    ")
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -42,26 +42,30 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	currentUser, err := authentication.GetUserByToken(req)
+func UpdateUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	currentUser, err := authentication.GetUserByToken(r)
 	if err != nil {
-		w.WriteHeader(http.InternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
-	resp, statusCode := currentUser.Update(postgres.DB())
+	updateUser := new(models.User)
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&updateUser)
+
+	resp, statusCode := currentUser.Update(postgres.DB(), updateUser)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(resp)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	currentUser, err := authentication.GetUserByToken(req)
+	currentUser, err := authentication.GetUserByToken(r)
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write("internal server error")
+		w.Write([]byte("internal server error"))
 	}
-	resp, status = currentUser.Delete(postgres.DB())
+	resp, status := currentUser.Delete(postgres.DB())
 	if status != http.StatusCreated {
 		w.WriteHeader(status)
 		w.Write(resp)
