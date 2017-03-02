@@ -1,0 +1,2 @@
+curl -i -H "Accept: application/json" -H "Content-Type: application/json" -XPOST -d '{"email": "trevor@youfie.io", "display_name": "trevor", "password": "venice"}' http://localhost:5000/users
+
