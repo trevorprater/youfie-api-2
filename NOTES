@@ -1,11 +1,11 @@
 YOUFIE.IO PUBLIC API SPEC V0.1
 
-https://youfie.io/api/v1/login {POST}
+https://youfie.io/api/v1/users/<user_id>/login {POST}
 
     - curl -XPOST -d '{"email": "trevor@youfie.io", "password": "youfie"}'
         -> logs a user in, returns a JWT
 
-https://youfie.io/api/v1/logout {POST}
+https://youfie.io/api/v1/users/<user_id>/logout {POST}
 
     - curl -XPOST -H "Authorization: Bearer <JWT>" 
         -> logs out of the current account, blacklisting the user's current JWT
