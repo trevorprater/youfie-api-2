@@ -75,9 +75,11 @@ func DeleteUser(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 	requestUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestUser)
+	requestUser.DisplayName = vars["display_name"]
 
 	responseStatus, token := services.Login(requestUser)
 	w.Header().Set("Content-Type", "application/json")

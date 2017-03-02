@@ -55,7 +55,7 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, e
 }
 
 func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) bool {
-	dbUser, err := models.GetUserByEmail(user.Email, postgres.DB())
+	dbUser, err := models.GetUserByDisplayName(user.DisplayName, postgres.DB())
 	if err != nil {
 		log.Printf("Cannot get user by email: %v, error: %v", user.Email, err.Error())
 		return false
@@ -70,7 +70,7 @@ func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) bool {
 		log.Println("Incorrect password supplied!")
 		return false
 	}
-	return dbUser.Email == user.Email
+	return dbUser.DisplayName == user.DisplayName
 }
 
 func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {
