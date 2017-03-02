@@ -9,22 +9,22 @@ import (
 
 func SetUserRoutes(router *mux.Router) *mux.Router {
 	// ====================CRUD USER=================================
-	router.HandleFunc("/user", controllers.CreateUser).Methods("POST")
+	router.HandleFunc("/users", controllers.CreateUser).Methods("POST")
 
-	router.Handle("/user/{display_name}",
+	router.Handle("/users/{display_name}",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserWritePermission),
 			negroni.HandlerFunc(controllers.UpdateUser),
 		)).Methods("PUT")
-	router.Handle("/user/{display_name}",
+	router.Handle("/users/{display_name}",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserDeletePermission),
 			negroni.HandlerFunc(controllers.DeleteUser),
 			negroni.HandlerFunc(controllers.Logout),
 		)).Methods("DELETE")
-	router.Handle("/user/{display_name}",
+	router.Handle("/users/{display_name}",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserReadPermission),
@@ -32,15 +32,15 @@ func SetUserRoutes(router *mux.Router) *mux.Router {
 		)).Methods("GET")
 
 	// ====================LOGIN/LOGOUT/REFRESH-TOKEN========================
-	router.HandleFunc("/user/{display_name}/login", controllers.Login).Methods("POST")
+	router.HandleFunc("/users/{display_name}/login", controllers.Login).Methods("POST")
 
-	router.Handle("/user/{display_name}/refresh-token",
+	router.Handle("/users/{display_name}/refresh-token",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.RefreshToken),
 		)).Methods("POST")
 
-	router.Handle("/user/{display_name}/logout",
+	router.Handle("/users/{display_name}/logout",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.Logout),
