@@ -6,7 +6,7 @@ import (
 
 func InitRoutes() *mux.Router {
 	router := mux.NewRouter()
-	router = SetHelloRoutes(router)
+	//router = SetHelloRoutes(router)
 	router = SetUserRoutes(router)
 	return router
 }
