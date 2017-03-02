@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -25,7 +26,10 @@ func Login(requestUser *models.User) (int, []byte) {
 		return http.StatusInternalServerError, []byte(err.Error())
 	} else {
 		response, _ := json.Marshal(parameters.TokenAuthentication{token})
-		requestUser.UpdateLastLogin(postgres.DB())
+		err = authedUser.UpdateLastLogin(postgres.DB())
+		if err != nil {
+			log.Println(err)
+		}
 		return http.StatusOK, response
 	}
 }

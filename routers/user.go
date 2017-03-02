@@ -43,6 +43,7 @@ func SetUserRoutes(router *mux.Router) *mux.Router {
 	router.Handle("/users/{display_name}/logout",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
+			negroni.HandlerFunc(authentication.RequireUserLogoutPermission),
 			negroni.HandlerFunc(controllers.Logout),
 		)).Methods("POST")
 

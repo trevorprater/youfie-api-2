@@ -76,7 +76,12 @@ func (u *User) Insert(db sqlx.Ext) ([]byte, int) {
 			return []byte("internal server error"), http.StatusInternalServerError
 		}
 	} else {
-		userJson, err := json.MarshalIndent(&u, "", "    ")
+		createdUser, err := GetUserByEmail(u.Email, db)
+		if err != nil {
+			log.Println(err)
+			return []byte("internal server error"), http.StatusInternalServerError
+		}
+		userJson, err := json.MarshalIndent(&createdUser, "", "    ")
 		if err != nil {
 			log.Println(err)
 			return []byte("internal server error"), http.StatusInternalServerError
@@ -112,24 +117,26 @@ func (u *User) Update(db sqlx.Ext, updatedUser *User) ([]byte, int) {
 
 	q := `
 		UPDATE users
-		SET updated = :updated_at,
+		SET updated_at = :updated_at,
 			email = :email,
 			display_name = :display_name,
 			hash = :hash
 		WHERE id = :id
 		`
+	updatedUser.ID = u.ID
 	if updatedUser.isPasswordValid() {
-		pwHash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+		pwHash, err := bcrypt.GenerateFromPassword([]byte(updatedUser.Password), 10)
 		if err != nil {
 			log.Println("could not generate a hash from the password!")
 			return []byte("invalid password"), http.StatusInternalServerError
 		}
-		u.PasswordHash = string(pwHash)
-	} else {
+		updatedUser.PasswordHash = string(pwHash)
+	} else if len(updatedUser.Password) > 0 {
 		return []byte("invalid password"), http.StatusInternalServerError
+	} else {
 		updatedUser.PasswordHash = u.PasswordHash
 	}
-	u.Password = ""
+	updatedUser.Password = ""
 	if !updatedUser.isEmailValid() {
 		updatedUser.Email = u.Email
 	} else {
@@ -149,7 +156,8 @@ func (u *User) Update(db sqlx.Ext, updatedUser *User) ([]byte, int) {
 	}
 
 	if err != nil {
-		return []byte(err.Error()), http.StatusInternalServerError
+		log.Println(err)
+		return []byte("unable to update user!"), http.StatusInternalServerError
 	}
 
 	count, err := res.RowsAffected()

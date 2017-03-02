@@ -104,3 +104,18 @@ func RequireUserDeletePermission(rw http.ResponseWriter, req *http.Request, next
 		rw.WriteHeader(http.StatusUnauthorized)
 	}
 }
+
+func RequireUserLogoutPermission(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	vars := mux.Vars(req)
+	user, err := GetUserByToken(req)
+	if err != nil {
+		log.Println(err)
+		rw.WriteHeader(http.StatusUnauthorized)
+	}
+	if user.DisplayName == vars["display_name"] {
+		next(rw, req)
+	} else {
+		log.Println("the current user, " + user.Email + ", is not the user being requested.")
+		rw.WriteHeader(http.StatusUnauthorized)
+	}
+}
