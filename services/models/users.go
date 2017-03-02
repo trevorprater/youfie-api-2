@@ -16,11 +16,11 @@ type User struct {
 	ID            string    `json:"id" form:"-" db:"id"`
 	Email         string    `json:"email" form:"email" db:"email"`
 	DisplayName   string    `json:"display_name" form:"display_name" db:"display_name"`
-	PasswordHash  string    `json:"hash" form:"-" db:"hash"`
-	Password      string    `json:"password,omit" form:"password" db:"password"`
+	PasswordHash  string    `json:"-" form:"-" db:"hash"`
+	Password      string    `json:"password,omitempty" form:"password,omitempty" db:"password"`
 	Admin         bool      `json:"-" form:"-" db:"admin"`
 	Disabled      bool      `json:"-" form:"-" db:"disabled"`
-	DisabledUntil time.Time `json:"disabled_until" form:"disabled_until" db:"disabled_until"`
+	DisabledUntil time.Time `json:"-" form:"-" db:"disabled_until"`
 	LastLogin     time.Time `json:"last_login" form:"-" db:"last_login"`
 	CreatedAt     time.Time `json:"created_at" form:"created_at" db:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`

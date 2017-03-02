@@ -54,23 +54,26 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, e
 	return tokenString, nil
 }
 
-func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) bool {
+func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) (*models.User, error) {
 	dbUser, err := models.GetUserByDisplayName(user.DisplayName, postgres.DB())
 	if err != nil {
 		log.Printf("Cannot get user by email: %v, error: %v", user.Email, err.Error())
-		return false
+		return nil, err
 	}
 
 	if dbUser.Disabled {
 		log.Printf("User has been disabled!")
-		return false
+		return nil, err
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(dbUser.PasswordHash), []byte(user.Password)) != nil {
 		log.Println("Incorrect password supplied!")
-		return false
+		return nil, errors.New("incorrect password")
 	}
-	return dbUser.DisplayName == user.DisplayName
+	if dbUser.DisplayName == user.DisplayName {
+		return dbUser, nil
+	}
+	return nil, errors.New("login failed")
 }
 
 func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {

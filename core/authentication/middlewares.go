@@ -15,12 +15,14 @@ import (
 func GetUserByToken(req *http.Request) (*models.User, error) {
 	token, err := parseTokenFromRequest(req)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
 	if cleanToken, ok := token.(*jwt.Token); ok {
 		userID, err := GetTokenSubject(cleanToken)
 		if err != nil {
+			log.Println(err)
 			return nil, err
 		}
 		return models.GetUserByID(userID, postgres.DB())
@@ -44,6 +46,7 @@ func RequireTokenAuthentication(rw http.ResponseWriter, req *http.Request, next 
 	authBackend := InitJWTAuthenticationBackend()
 	token, err := parseTokenFromRequest(req)
 	if err != nil {
+		log.Println(err)
 		rw.WriteHeader(http.StatusUnauthorized)
 	} else {
 		if cleanToken, ok := token.(*jwt.Token); ok {
@@ -67,7 +70,7 @@ func RequireUserReadPermission(rw http.ResponseWriter, req *http.Request, next h
 	if user.DisplayName == vars["display_name"] {
 		next(rw, req)
 	} else {
-		log.Println("the current user " + user.Email + " is not the user being requested.")
+		log.Println("the current user, " + user.Email + ", is not the user being requested.")
 		rw.WriteHeader(http.StatusUnauthorized)
 	}
 }
@@ -82,7 +85,7 @@ func RequireUserWritePermission(rw http.ResponseWriter, req *http.Request, next 
 	if user.DisplayName == vars["display_name"] {
 		next(rw, req)
 	} else {
-		log.Println("the current user " + user.Email + " is not the user being requested.")
+		log.Println("the current user, " + user.Email + ", is not the user being requested.")
 		rw.WriteHeader(http.StatusUnauthorized)
 	}
 }
@@ -97,7 +100,7 @@ func RequireUserDeletePermission(rw http.ResponseWriter, req *http.Request, next
 	if user.DisplayName == vars["display_name"] {
 		next(rw, req)
 	} else {
-		log.Println("the current user " + user.Email + " is not the user being requested.")
+		log.Println("the current user, " + user.Email + ", is not the user being requested.")
 		rw.WriteHeader(http.StatusUnauthorized)
 	}
 }

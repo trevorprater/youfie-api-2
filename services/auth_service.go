@@ -15,18 +15,19 @@ import (
 func Login(requestUser *models.User) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 
-	if authBackend.Authenticate(requestUser) {
-		token, err := authBackend.GenerateToken(requestUser.ID)
-		if err != nil {
-			return http.StatusInternalServerError, []byte(err.Error())
-		} else {
-			response, _ := json.Marshal(parameters.TokenAuthentication{token})
-			requestUser.UpdateLastLogin(postgres.DB())
-			return http.StatusOK, response
-		}
+	authedUser, err := authBackend.Authenticate(requestUser)
+	if err != nil || authedUser == nil {
+		return http.StatusUnauthorized, []byte("login failed")
 	}
 
-	return http.StatusUnauthorized, []byte("")
+	token, err := authBackend.GenerateToken(authedUser.ID)
+	if err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	} else {
+		response, _ := json.Marshal(parameters.TokenAuthentication{token})
+		requestUser.UpdateLastLogin(postgres.DB())
+		return http.StatusOK, response
+	}
 }
 
 func RefreshToken(userID string) []byte {
