@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	validEmailTest = regexp.MustCompile(`^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$`)
+	ValidEmailTest = regexp.MustCompile(`^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$`)
 )
 
 func Duperr(err error) bool {
@@ -26,7 +26,7 @@ func Duperr(err error) bool {
 func SanitizeEmail(email string) (string, error) {
 	email = strings.ToLower(email)
 
-	if !validEmailTest.MatchString(email) {
+	if !ValidEmailTest.MatchString(email) {
 		return "", errors.New("invalid email")
 	}
 

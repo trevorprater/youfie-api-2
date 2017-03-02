@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"log"
 	"os"
 	"time"
@@ -75,12 +76,30 @@ func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) bool {
 func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {
 	if validity, ok := timestamp.(float64); ok {
 		tm := time.Unix(int64(validity), 0)
-		remainer := tm.Sub(time.Now())
-		if remainer > 0 {
-			return int(remainer.Seconds() + expireOffset)
+		remainder := tm.Sub(time.Now())
+		if remainder > 0 {
+			return int(remainder.Seconds() + expireOffset)
 		}
 	}
 	return expireOffset
+}
+
+func (backend *JWTAuthenticationBackend) IsTokenValid(token *jwt.Token) bool {
+	if claimsMap, ok := token.Claims.(jwt.MapClaims); ok {
+		if backend.getTokenRemainingValidity(claimsMap["exp"]) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func GetTokenSubject(token *jwt.Token) (string, error) {
+	if claimsMap, ok := token.Claims.(jwt.MapClaims); ok {
+		if subject, _ok := claimsMap["sub"].(string); _ok {
+			return subject, nil
+		}
+	}
+	return "", errors.New("Invalid Key: subject not found")
 }
 
 func (backend *JWTAuthenticationBackend) Logout(tokenString string, token *jwt.Token) error {

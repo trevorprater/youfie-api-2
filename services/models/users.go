@@ -1,12 +1,13 @@
 package models
 
 import (
-	"log"
-	"time"
-	"net/http"
 	"encoding/json"
+	"log"
+	"net/http"
+	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pborman/uuid"
 	"github.com/trevorprater/youfie-api-2/core/etc"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -37,43 +38,162 @@ func GetUserByID(id string, db sqlx.Ext) (*User, error) {
 	return &user, err
 }
 
-func (u *User) create(db sqlx.Ext) error {
-	pwHash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
-	if err != nil {
-		log.Println("could not generate a hash from the password!")
-		return err
-	}
-	u.PasswordHash = string(pwHash)
+func GetUserByDisplayName(displayName string, db sqlx.Ext) (*User, error) {
+	var user User
+	err := sqlx.Get(db, &user, "SELECT * FROM users where display_name='"+displayName+"'")
+	return &user, err
+}
 
-	_, err = sqlx.NamedExec(db, `
+func (u *User) Insert(db sqlx.Ext) ([]byte, int) {
+	if u.isPasswordValid() {
+		pwHash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+		if err != nil {
+			log.Println("could not generate a hash from the password!")
+			return []byte("invalid password provided"), http.StatusInternalServerError
+		}
+		u.PasswordHash = string(pwHash)
+	} else {
+		return []byte("invalid password provided"), http.StatusInternalServerError
+	}
+
+	if !u.isEmailValid() {
+		return []byte("invalid email provided"), http.StatusInternalServerError
+	}
+
+	if !u.isDisplayNameValid() {
+		return []byte("invalid display name provided"), http.StatusInternalServerError
+	}
+
+	_, err := sqlx.NamedExec(db, `
 		INSERT INTO users
 		(email, display_name, hash)
 		VALUES (:email, :display_name, :hash)`, u)
-
-	return err
+	if err != nil {
+		log.Println(err)
+		if etc.Duperr(err) {
+			return []byte("user already exists: " + err.Error()), http.StatusConflict
+		} else {
+			return []byte("internal server error"), http.StatusInternalServerError
+		}
+	} else {
+		userJson, err := json.MarshalIndent(&u, "", "    ")
+		if err != nil {
+			log.Println(err)
+			return []byte("internal server error"), http.StatusInternalServerError
+		}
+		return userJson, http.StatusCreated
+	}
 }
 
-func (u *User) InsertUser(db sqlx.Ext) (int, []byte) {
-	err := u.create(db)
+func (u *User) isEmailValid() bool {
+	if u.Email != "" && etc.ValidEmailTest.MatchString(u.Email) {
+		return true
+	}
+	return false
+}
 
-	// unique constraint violated
+func (u *User) isPasswordValid() bool {
+	if len(u.Password) >= 6 {
+		return true
+	}
+	return false
+}
+
+func (u *User) isDisplayNameValid() bool {
+	if len(u.DisplayName) >= 4 {
+		return true
+	}
+	return false
+}
+
+func (u *User) Update(db sqlx.Ext, updatedUser *User) ([]byte, int) {
+	updatedUser.CreatedAt = u.CreatedAt.In(time.UTC)
+	updatedUser.UpdatedAt = time.Now().In(time.UTC)
+
+	q := `
+		UPDATE users
+		SET updated = :updated_at,
+			email = :email,
+			display_name = :display_name,
+			hash = :hash
+		WHERE id = :id
+		`
+	if updatedUser.isPasswordValid() {
+		pwHash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
+		if err != nil {
+			log.Println("could not generate a hash from the password!")
+			return []byte("invalid password"), http.StatusInternalServerError
+		}
+		u.PasswordHash = string(pwHash)
+	} else {
+		return []byte("invalid password"), http.StatusInternalServerError
+		updatedUser.PasswordHash = u.PasswordHash
+	}
+	u.Password = ""
+	if !updatedUser.isEmailValid() {
+		updatedUser.Email = u.Email
+	} else {
+		return []byte("invalid email"), http.StatusInternalServerError
+	}
+	if !updatedUser.isDisplayNameValid() {
+		updatedUser.DisplayName = u.DisplayName
+	} else {
+		return []byte("invalid display name"), http.StatusInternalServerError
+	}
+
+	res, err := sqlx.NamedExec(db, q, updatedUser)
+
 	if etc.Duperr(err) {
-		log.Printf("User already exists %v: %v", u.Email, err.Error())
-		return http.StatusConflict, []byte("")
+		log.Println(err)
+		return []byte("unique constraint violated: " + err.Error()), http.StatusConflict
 	}
 
 	if err != nil {
-		log.Println(err)
-		return http.StatusInternalServerError, []byte("")
+		return []byte(err.Error()), http.StatusInternalServerError
 	}
 
-	response, err := json.MarshalIndent(&u, "", "    ")
+	count, err := res.RowsAffected()
 	if err != nil {
 		log.Println(err)
-		return http.StatusInternalServerError, []byte("")
+		return []byte("internal server error"), http.StatusInternalServerError
+	}
+	if count < 1 {
+		log.Println("user not found")
+		return []byte("user not found"), http.StatusNotFound
 	}
 
-	return http.StatusCreated, response
+	updatedUser, err = GetUserByEmail(updatedUser.Email, db)
+	if err != nil {
+		log.Println(err)
+		return []byte("user not found: " + updatedUser.Email), http.StatusNotFound
+	}
+
+	userJson, err := json.MarshalIndent(&updatedUser, "", "    ")
+	if err != nil {
+		log.Println(err)
+		return []byte("internal server error"), http.StatusInternalServerError
+	}
+	return userJson, http.StatusCreated
+}
+
+func (u *User) Delete(db sqlx.Ext) ([]byte, int) {
+	if uuid.Parse(u.ID) == nil {
+		log.Println("user not found: " + u.ID)
+		return []byte("user not found"), http.StatusNotFound
+	}
+	res, err := db.Exec(`
+		DELETE FROM users WHERE id = $1`, u.ID,
+	)
+	count, err := res.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return []byte("internal server error"), http.StatusInternalServerError
+	}
+	if count < 1 {
+		log.Println(err)
+		return []byte("user not found"), http.StatusNotFound
+	}
+	return []byte("user deleted"), http.StatusCreated
 }
 
 func (u *User) UpdateLastLogin(db sqlx.Ext) error {
