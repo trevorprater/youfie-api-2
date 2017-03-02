@@ -124,32 +124,36 @@ func (u *User) Update(db sqlx.Ext, updatedUser *User) ([]byte, int) {
 		WHERE id = :id
 		`
 	updatedUser.ID = u.ID
+
 	if updatedUser.isPasswordValid() {
 		pwHash, err := bcrypt.GenerateFromPassword([]byte(updatedUser.Password), 10)
 		if err != nil {
 			log.Println("could not generate a hash from the password!")
-			return []byte("invalid password"), http.StatusInternalServerError
+			return []byte("invalid password"), http.StatusUnprocessableEntity
 		}
 		updatedUser.PasswordHash = string(pwHash)
 	} else if len(updatedUser.Password) > 0 {
-		return []byte("invalid password"), http.StatusInternalServerError
+		return []byte("invalid password"), http.StatusUnprocessableEntity
 	} else {
 		updatedUser.PasswordHash = u.PasswordHash
 	}
 	updatedUser.Password = ""
+
 	if !updatedUser.isEmailValid() {
+		if len(updatedUser.Email) > 0 {
+			return []byte("invalid email"), http.StatusUnprocessableEntity
+		}
 		updatedUser.Email = u.Email
-	} else {
-		return []byte("invalid email"), http.StatusInternalServerError
 	}
+
 	if !updatedUser.isDisplayNameValid() {
+		if len(updatedUser.DisplayName) > 0 {
+			return []byte("invalid display name"), http.StatusUnprocessableEntity
+		}
 		updatedUser.DisplayName = u.DisplayName
-	} else {
-		return []byte("invalid display name"), http.StatusInternalServerError
 	}
 
 	res, err := sqlx.NamedExec(db, q, updatedUser)
-
 	if etc.Duperr(err) {
 		log.Println(err)
 		return []byte("unique constraint violated: " + err.Error()), http.StatusConflict
