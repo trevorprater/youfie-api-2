@@ -16,7 +16,7 @@ import (
 func Login(requestUser *models.User) (int, []byte) {
 	authBackend := authentication.InitJWTAuthenticationBackend()
 
-	authedUser, err := authBackend.Authenticate(requestUser)
+	authedUser, err := authBackend.Authenticate(requestUser, postgres.DB())
 	if err != nil || authedUser == nil {
 		return http.StatusUnauthorized, []byte("login failed")
 	}

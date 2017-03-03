@@ -11,7 +11,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/trevorprater/youfie-api-2/core/postgres"
+	"github.com/jmoiron/sqlx"
 	"github.com/trevorprater/youfie-api-2/core/redis"
 	"github.com/trevorprater/youfie-api-2/services/models"
 	"github.com/trevorprater/youfie-api-2/settings"
@@ -54,8 +54,8 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, e
 	return tokenString, nil
 }
 
-func (backend *JWTAuthenticationBackend) Authenticate(user *models.User) (*models.User, error) {
-	dbUser, err := models.GetUserByDisplayName(user.DisplayName, postgres.DB())
+func (backend *JWTAuthenticationBackend) Authenticate(user *models.User, db sqlx.Ext) (*models.User, error) {
+	dbUser, err := models.GetUserByDisplayName(user.DisplayName, db)
 	if err != nil {
 		log.Printf("Cannot get user by email: %v, error: %v", user.Email, err.Error())
 		return nil, err

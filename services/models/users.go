@@ -28,19 +28,19 @@ type User struct {
 
 func GetUserByEmail(email string, db sqlx.Ext) (*User, error) {
 	var user User
-	err := sqlx.Get(db, &user, "SELECT * FROM users where email='"+email+"'")
+	err := sqlx.Get(db, &user, "SELECT * FROM users WHERE email='"+email+"'")
 	return &user, err
 }
 
 func GetUserByID(id string, db sqlx.Ext) (*User, error) {
 	var user User
-	err := sqlx.Get(db, &user, "SELECT * FROM users where id='"+id+"'")
+	err := sqlx.Get(db, &user, "SELECT * FROM users WHERE id='"+id+"'")
 	return &user, err
 }
 
 func GetUserByDisplayName(displayName string, db sqlx.Ext) (*User, error) {
 	var user User
-	err := sqlx.Get(db, &user, "SELECT * FROM users where display_name='"+displayName+"'")
+	err := sqlx.Get(db, &user, "SELECT * FROM users WHERE display_name='"+displayName+"'")
 	return &user, err
 }
 
