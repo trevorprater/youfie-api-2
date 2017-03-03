@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"runtime"
 
 	"github.com/trevorprater/youfie-api-2/core/postgres"
 	"github.com/trevorprater/youfie-api-2/routers"
@@ -12,6 +13,7 @@ import (
 )
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	err := postgres.Load()
 	if err != nil {
 		log.Fatal(err)
