@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -57,7 +58,7 @@ func (p *Photo) Insert(userID string, db sqlx.Ext) ([]byte, int) {
 			log.Println(err)
 			return []byte("internal server error"), http.StatusInternalServerError
 		}
-		return photoJson, http.StatusCrated
+		return photoJson, http.StatusCreated
 	}
 }
 
