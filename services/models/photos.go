@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pborman/uuid"
@@ -18,6 +19,9 @@ type Photo struct {
 	Latitude   float64 `json:"latitude" form:"latitude" db:"latitude"`
 	Longitude  float64 `json:"longitude" form:"longitude" db:"longitude"`
 	Processed  bool    `json:"processed" form:"-" db:"processed"`
+
+	CreatedAt time.Time `json:"created_at" form:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`
 }
 
 func GetPhotosForUser(userID string, db sqlx.Ext) ([]*Photo, error) {
