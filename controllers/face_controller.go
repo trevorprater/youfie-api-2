@@ -50,12 +50,18 @@ func CreateFace(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 	vars := mux.Vars(r)
 	requestFace := new(models.Face)
 	decoder := json.NewDecoder(r.Body)
-	decoder.Decode(&requestPhoto)
-
-	resp, statusCode := requestPhoto.Insert(postgres.DB())
-	rw.Header.Set("Content-Type", "application/json")
-	rw.WriteHeader(statusCode)
-	rw.Write(resp)
+	decoder.Decode(&requestFace)
+	db := postgres.DB()
+	user, err := models.GetUserByDisplayName(vars["display_name"], db)
+	if err != nil {
+		log.Println(err)
+		rw.WriteHeader(http.StatusInternalServerError)
+	} else {
+		resp, statusCode := requestFace.Insert(vars["photo_id"], user.ID, postgres.DB())
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(statusCode)
+		rw.Write(resp)
+	}
 }
 
 func DeleteFace(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

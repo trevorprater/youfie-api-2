@@ -45,7 +45,7 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 func UpdateUser(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	currentUser, err := authentication.GetUserByToken(r)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusInternalServerError)
 	}
 	updateUser := new(models.User)
 	decoder := json.NewDecoder(r.Body)

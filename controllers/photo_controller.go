@@ -29,7 +29,6 @@ func GetPhotos(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 }
 
 func CreatePhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	vars := mux.Vars(r)
 	requestPhoto := new(models.Photo)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestPhoto)

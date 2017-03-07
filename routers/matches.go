@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
+	"github.com/trevorprater/youfie-api-2/controllers"
 	"github.com/trevorprater/youfie-api-2/core/authentication"
 )
 

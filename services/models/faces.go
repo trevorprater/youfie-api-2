@@ -28,19 +28,19 @@ type Face struct {
 	UpdatedAt time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`
 }
 
-func GetFacesForPhoto(photoID string, db sqlx.Ext) {
+func GetFacesForPhoto(photoID string, db sqlx.Ext) ([]*Face, error) {
 	var faces []*Face
 	err := sqlx.Get(db, &faces, "SELECT * FROM faces where photo_id='"+photoID+"'")
-	return &faces, err
+	return faces, err
 }
 
-func GetFaceByID(faceID string, db sqlx.Ext) {
+func GetFaceByID(faceID string, db sqlx.Ext) (*Face, error) {
 	var face Face
-	err := sqlx.Get(db, &face, "SELECT * FROM face WHERE id='"+id+"'")
+	err := sqlx.Get(db, &face, "SELECT * FROM face WHERE id='"+faceID+"'")
 	return &face, err
 }
 
-func (f *Face) Insert(photoID, userID string, db sqlx.Ext) {
+func (f *Face) Insert(photoID, userID string, db sqlx.Ext) ([]byte, int) {
 	_, err := sqlx.NamedExec(db, `
 	INSERT INTO faces
 	(id, photo_id, feature_vector, bb_top_left_x, bb_top_left_y, bb_top_right_x, bb_top_right_y, bb_bottom_left_x, bb_bottom_left_y, bb_bottom_right_x, bb_bottom_right_y)
@@ -63,8 +63,8 @@ func (f *Face) Insert(photoID, userID string, db sqlx.Ext) {
 	}
 }
 
-func (f *Face) Delete(faceID string, db sqlx.Ext) {
-	if uuid.Parse(p.ID) == nil {
+func (f *Face) Delete(db sqlx.Ext) ([]byte, int) {
+	if uuid.Parse(f.ID) == nil {
 		log.Println("face not found: " + f.ID)
 		return []byte("face not found"), http.StatusNotFound
 	}

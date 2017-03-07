@@ -17,7 +17,7 @@ func GetMatches(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)
 	}
-	matchesJson, err := json.MarshalIndent(&photos, "", "    ")
+	matchesJson, err := json.MarshalIndent(&matches, "", "    ")
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusInternalServerError)
@@ -47,7 +47,6 @@ func GetMatch(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 }
 
 func CreateMatch(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	vars := mux.Vars(r)
 	requestMatch := new(models.Match)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestMatch)
@@ -59,14 +58,21 @@ func CreateMatch(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 }
 
 func UpdateMatch(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	vars := mux.Vars(r)
+	rw.Header().Set("Content-Type", "application/json")
 	updateMatch := new(models.Match)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&updateMatch)
-
-	resp, statusCode := currentMatch.Update(postgres.DB(), updateMatch)
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(statusCode)
-	rw.Write(resp)
+	db := postgres.DB()
+	dbMatch, err := models.GetMatchByID(vars["match_id"], db)
+	if err != nil {
+		rw.WriteHeader(http.StatusNotFound)
+		rw.Write([]byte("cannot find match"))
+	} else {
+		resp, statusCode := dbMatch.Update(db, updateMatch)
+		rw.WriteHeader(statusCode)
+		rw.Write(resp)
+	}
 }
 
 func DeleteMatch(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {

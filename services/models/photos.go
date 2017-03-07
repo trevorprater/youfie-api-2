@@ -29,16 +29,16 @@ func GetPhotosForUser(userID string, db sqlx.Ext) ([]*Photo, error) {
 	// TODO: GET OFFSET AND LIMIT
 	var photos []*Photo
 	err := sqlx.Get(db, &photos, "SELECT * FROM photos WHERE user_id='"+userID+"'")
-	return &photos, err
+	return photos, err
 }
 
-func GetPhotoByID(photoID string, db sqlx.Ext) (*Photo, error) {
+func GetPhotoByID(id string, db sqlx.Ext) (*Photo, error) {
 	var photo Photo
 	err := sqlx.Get(db, &photo, "SELECT * FROM photos WHERE id='"+id+"'")
 	return &photo, err
 }
 
-func (p *Photo) Insert(userID string, db sqlx.Ext) ([]byte, int) {
+func (p *Photo) Insert(db sqlx.Ext) ([]byte, int) {
 	// TODO: process photo content, width, height, validate format, generate id, add lat/lng
 	_, err := sqlx.NamedExec(db, `
 		INSERT INTO photos
@@ -68,7 +68,7 @@ func (p *Photo) Delete(db sqlx.Ext) ([]byte, int) {
 		return []byte("photo not found"), http.StatusNotFound
 	}
 	res, err := db.Exec(`
-		DELETE FROM photos WHERE id = $1`, u.ID,
+		DELETE FROM photos WHERE id = $1`, p.ID,
 	)
 	count, err := res.RowsAffected()
 	if err != nil {

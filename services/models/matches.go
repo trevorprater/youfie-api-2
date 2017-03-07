@@ -26,12 +26,12 @@ func GetMatchesForUser(userID string, db sqlx.Ext) ([]*Match, error) {
 	// TODO: GET OFFSET AND LIMIT
 	var matches []*Match
 	err := sqlx.Get(db, &matches, "SELECT * FROM matches WHERE user_id='"+userID+"'")
-	return &matches, err
+	return matches, err
 }
 
 func GetMatchByID(id string, db sqlx.Ext) (*Match, error) {
 	var match Match
-	err := sqlx.Get(db&match, "SELECT * FROM match WHERE id='"+id+"'")
+	err := sqlx.Get(db, &match, "SELECT * FROM match WHERE id='"+id+"'")
 	return &match, err
 }
 
@@ -54,7 +54,7 @@ func (m *Match) Insert(db sqlx.Ext) ([]byte, int) {
 			log.Println(err)
 			return []byte("internal server error"), http.StatusInternalServerError
 		}
-		return photosJson, http.StatusCreated
+		return matchJson, http.StatusCreated
 	}
 }
 
@@ -69,7 +69,7 @@ func (m *Match) Update(db sqlx.Ext, updatedMatch *Match) ([]byte, int) {
 		WHERE id = :id`
 
 	m.Confirmed = updatedMatch.Confirmed
-	m.UserSeen = updatedMatch.UserSeen
+	m.UserAcknowledged = updatedMatch.UserAcknowledged
 
 	res, err := sqlx.NamedExec(db, q, m)
 	if err != nil {
