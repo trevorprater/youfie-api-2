@@ -35,7 +35,7 @@ func CreatePhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	decoder.Decode(&requestPhoto)
 
 	resp, statusCode := requestPhoto.Insert(postgres.DB())
-	rw.Header.Set("Content-Type", "application/json")
+	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(statusCode)
 	rw.Write(resp)
 }
