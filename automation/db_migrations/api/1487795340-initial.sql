@@ -25,13 +25,13 @@ CREATE TABLE photos(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     owner_id UUID REFERENCES users (id),
     format TEXT NOT NULL,
-    content BYTEA NOT NULL,
     width INT NOT NULL,
     height INT NOT NULL,
     storage_url TEXT,
     latitude NUMERIC(10, 6),
     longitude NUMERIC(10, 6),
     processed BOOLEAN DEFAULT false,
+    processing BOOLEAN default false,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
