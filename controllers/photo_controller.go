@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/trevorprater/youfie-api-2/core/postgres"
+	"github.com/trevorprater/youfie-api-2/services/models"
 )
 
 func GetPhotos(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
@@ -65,10 +66,6 @@ func DeletePhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 		rw.WriteHeader(http.StatusNotFound)
 	}
 	resp, status := photo.Delete(postgres.DB())
-	if status != http.StatusCreated {
-		w.WriteHeader(status)
-		w.Write(resp)
-	} else {
-		next(w, r)
-	}
+	w.WriteHeader(status)
+	w.Write(resp)
 }
