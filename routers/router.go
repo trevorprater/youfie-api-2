@@ -8,6 +8,7 @@ func InitRoutes() *mux.Router {
 	router := mux.NewRouter()
 	router = SetUserRoutes(router)
 	router = SetPhotoRoutes(router)
-	router = SetFaceRouters(router)
+	router = SetFaceRoutes(router)
+	router = SetMatchRoutes(router)
 	return router
 }

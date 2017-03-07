@@ -30,4 +30,5 @@ func SetFaceRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(authentication.RequireUserWritePermission),
 			negroni.HandlerFunc(authentication.DeleteFace),
 		)).Methods("DELETE")
+	return router
 }

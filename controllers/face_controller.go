@@ -20,11 +20,11 @@ func GetFaces(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	facesJson, err := json.MarshalIndent(&faces, "", "    ")
 	if err != nil {
 		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusInternalServerError)
 	} else {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(facesJson)
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(facesJson)
 	}
 }
 
@@ -38,11 +38,11 @@ func GetFace(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	faceJson, err := json.MarshalIndent(&face, "", "    ")
 	if err != nil {
 		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusInternalServerError)
 	} else {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(faceJson)
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(faceJson)
 	}
 }
 
@@ -53,9 +53,9 @@ func CreateFace(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 	decoder.Decode(&requestPhoto)
 
 	resp, statusCode := requestPhoto.Insert(postgres.DB())
-	w.Header.Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	w.Write(resp)
+	rw.Header.Set("Content-Type", "application/json")
+	rw.WriteHeader(statusCode)
+	rw.Write(resp)
 }
 
 func DeleteFace(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
@@ -66,6 +66,6 @@ func DeleteFace(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 		rw.WriteHeader(http.StatusNotFound)
 	}
 	resp, status := face.Delete(postgres.DB())
-	w.WriteHeader(status)
-	w.Write(resp)
+	rw.WriteHeader(status)
+	rw.Write(resp)
 }
