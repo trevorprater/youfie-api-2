@@ -21,5 +21,63 @@ CREATE TABLE users (
     UNIQUE(email, display_name)
 );
 
-insert into users(email, hash, display_name) VALUES ('trevor@youfie.io', '$2a$10$BW7ryN6m2lM8z7f57H69a.CXdQozmgrml20tf82lDE193nAozqKEa', 'trevor');
-insert into users(email, hash, display_name) VALUES ('admin@youfie.io', '$2a$10$BW7ryN6m2lM8z7f57H69a.CXdQozmgrml20tf82lDE193nAozqKEa', 'admin');
+CREATE TABLE photos(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    owner_id UUID REFERENCES users (id),
+    format TEXT NOT NULL,
+    content BYTEA NOT NULL,
+    width INT NOT NULL,
+    height INT NOT NULL,
+    storage_url TEXT,
+    lat NUMERIC(10, 6),
+    lng NUMERIC(10, 6),
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
+);
+
+
+CREATE TABLE video(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    format TEXT NOT NULL,
+    content BYTEA NOT NULL,
+    width INT NOT NULL,
+    height INT NOT NULL,
+    storage_url TEXT,
+    lat NUMERIC(10, 6),
+    lng NUMERIC(10, 6),
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
+);
+
+CREATE TABLE faces(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    photo_id UUID NOT NULL REFERENCES photos(id),
+    feature_vector decimal[128] NOT NULL,
+
+    bb_top_left_x INT NOT NULL,
+    bb_top_left_y INT NOT NULL,
+    bb_top_right_x INT NOT NULL,
+    bb_top_right_y INT NOT NULL,
+    bb_bottom_left_x INT NOT NULL,
+    bb_bottom_left_y INT NOT NULL,
+    bb_bottom_right_x INT NOT NULL,
+    bb_bottom_right_y INT NOT NULL,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
+);
+
+CREATE TABLE matches(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    photo_id UUID NOT NULL REFERENCES photos (id),
+    face_id UUID NOT NULL REFERENCES faces (id),
+    user_id UUID NOT NULL,
+    confidence DECIMAL,
+    confirmed BOOLEAN,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
+);
+
