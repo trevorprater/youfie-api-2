@@ -27,13 +27,13 @@ type Photo struct {
 func GetPhotosForUser(userID string, db sqlx.Ext) ([]*Photo, error) {
 	// TODO: GET OFFSET AND LIMIT
 	var photos []*Photo
-	err := sqlx.Get(db, &photos, "SELECT * FROM photos where user_id='"+userID+"'")
+	err := sqlx.Get(db, &photos, "SELECT * FROM photos WHERE user_id='"+userID+"'")
 	return &photos, err
 }
 
 func GetPhotoByID(photoID string, db sqlx.Ext) (*Photo, error) {
 	var photo Photo
-	err := sqlx.Get(db, &photo, "SELECT * FROM photos where id='"+id+"'")
+	err := sqlx.Get(db, &photo, "SELECT * FROM photos WHERE id='"+id+"'")
 	return &photo, err
 }
 
@@ -47,7 +47,7 @@ func (p *Photo) Insert(userID string, db sqlx.Ext) ([]byte, int) {
 		log.Println(err)
 		return []byte(err.Error()), http.StatusInternalServerError
 	} else {
-		createdPhoto, err := GetPhotoByID(p.PhotoID, db)
+		createdPhoto, err := GetPhotoByID(p.ID, db)
 		if err != nil {
 			log.Println(err)
 			return []byte("internal server error"), http.StatusInternalServerError
