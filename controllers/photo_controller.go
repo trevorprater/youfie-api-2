@@ -20,11 +20,11 @@ func GetPhotos(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	photosJson, err := json.MarshalIndent(&photos, "", "    ")
 	if err != nil {
 		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusInternalServerError)
 	} else {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(photosJson)
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(photosJson)
 	}
 }
 
@@ -35,9 +35,9 @@ func CreatePhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	decoder.Decode(&requestPhoto)
 
 	resp, statusCode := requestPhoto.Insert(postgres.DB())
-	w.Header.Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	w.Write(resp)
+	rw.Header.Set("Content-Type", "application/json")
+	rw.WriteHeader(statusCode)
+	rw.Write(resp)
 }
 
 func GetPhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
@@ -50,11 +50,11 @@ func GetPhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	photoJson, err := json.MarshalIndent(&photo, "", "    ")
 	if err != nil {
 		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusInternalServerError)
 	} else {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(photoJson)
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
+		rw.Write(photoJson)
 	}
 }
 
@@ -66,6 +66,6 @@ func DeletePhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 		rw.WriteHeader(http.StatusNotFound)
 	}
 	resp, status := photo.Delete(postgres.DB())
-	w.WriteHeader(status)
-	w.Write(resp)
+	rw.WriteHeader(status)
+	rw.Write(resp)
 }
