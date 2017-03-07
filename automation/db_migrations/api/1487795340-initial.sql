@@ -29,8 +29,8 @@ CREATE TABLE photos(
     width INT NOT NULL,
     height INT NOT NULL,
     storage_url TEXT,
-    lat NUMERIC(10, 6),
-    lng NUMERIC(10, 6),
+    latitude NUMERIC(10, 6),
+    longitude NUMERIC(10, 6),
     processed BOOLEAN DEFAULT false,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
