@@ -6,23 +6,33 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/trevorprater/youfie-api-2/core/authentication"
 	"github.com/trevorprater/youfie-api-2/core/postgres"
 	"github.com/trevorprater/youfie-api-2/services/models"
 )
 
 func GetMatches(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	vars := mux.Vars(r)
-	matches, err := models.GetMatchesForUser(vars["display_name"], postgres.DB())
+	rw.Header().Set("Content-Type", "application/json")
+	user, err := authentication.GetUserByToken(r)
+	if err != nil {
+		log.Println("could not find user by token")
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte("could not find user by token"))
+		return
+	}
+	matches, err := models.GetMatchesForUser(user.ID, postgres.DB())
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)
+		rw.Write([]byte("could not find user"))
+		return
 	}
 	matchesJson, err := json.MarshalIndent(&matches, "", "    ")
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("internal server error"))
 	} else {
-		rw.Header().Set("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write(matchesJson)
 	}

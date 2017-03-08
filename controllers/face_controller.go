@@ -12,17 +12,21 @@ import (
 
 func GetFaces(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	vars := mux.Vars(r)
+	rw.Header().Set("Content-Type", "application/json")
 	faces, err := models.GetFacesForPhoto(vars["photo_id"], postgres.DB())
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)
+		rw.Write([]byte("could not get faces for photo"))
+		return
 	}
 	facesJson, err := json.MarshalIndent(&faces, "", "    ")
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("internal server error"))
+		return
 	} else {
-		rw.Header().Set("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write(facesJson)
 	}
