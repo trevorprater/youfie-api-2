@@ -3,6 +3,7 @@ import requests
 import json
 from utils import utils
 
+
 class TestCreateUserAndLoginLogout(unittest.TestCase):
     def setUp(self):
         utils.delete_user_if_exists('test1', 'venice')
@@ -45,7 +46,7 @@ class TestCreateUserAndLoginLogout(unittest.TestCase):
         utils.create_user('test1', 'test1@youfie.io', 'venice')
         r = utils.create_user('test2', 'test1@youfie.io', 'venice')
         self.assertEqual(r.status_code, 409)
-    
+
     def test_create_user_fails_no_password(self):
         r = utils.create_user('test1', 'test1@youfie.io', '')
         self.assertEqual(r.status_code, 500)
@@ -63,8 +64,13 @@ class TestUpdateUser(unittest.TestCase):
 
     def test_update_user(self):
         r, session = utils.login('test_update', 'venice')
-        initial_user = json.loads(utils.view_user('test_update', session).content)
-        r = utils.update_user('test_update', {'password': 'newpass', 'email': 'trevor.prater@gmail.com', 'display_name': 'trevorp'}, session)
+        initial_user = json.loads(
+            utils.view_user('test_update', session).content)
+        r = utils.update_user('test_update', {
+            'password': 'newpass',
+            'email': 'trevor.prater@gmail.com',
+            'display_name': 'trevorp'
+        }, session)
         user = json.loads(r.content)
         self.assertTrue(user['display_name'] != initial_user['display_name'])
         self.assertTrue(user['display_name'] == 'trevorp')
@@ -100,4 +106,3 @@ class TestViewUser(unittest.TestCase):
         r, session = utils.login('test', 'venice')
         r = utils.view_user('test1', session)
         self.assertEqual(r.status_code, 401)
-
