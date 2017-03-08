@@ -9,11 +9,13 @@ class TestCreateUserAndLoginLogout(unittest.TestCase):
         utils.delete_user_if_exists('test1', 'venice')
         utils.delete_user_if_exists('test2', 'venice')
         utils.delete_user_if_exists('test1', 'pass')
+        utils.create_user('t', 't@youfie.io', 'venice')
 
     def tearDown(self):
         utils.delete_user_if_exists('test1', 'venice')
         utils.delete_user_if_exists('test2', 'venice')
         utils.delete_user_if_exists('test1', 'pass')
+        utils.create_user('t', 't@youfie.io', 'venice')
 
     def test_login(self):
         utils.create_user('test1', 'test1@youfie.io', 'venice')
@@ -58,6 +60,34 @@ class TestCreateUserAndLoginLogout(unittest.TestCase):
         r = utils.create_user('test1', 'test1@youfie.io', 'pass')
         self.assertEqual(r.status_code, 422)
         self.assertTrue('password' in r.content.lower())
+
+    def test_create_user_fails_weak_password(self):
+        pass
+
+    def test_create_user_fails_invalid_display_name(self):
+        r = utils.create_user('t', 't@youfie.io', 'venice')
+        self.assertEqual(r.status_code, 422)
+        self.assertTrue('name' in r.content)
+        self.assertTrue('invalid' in r.content)
+        r, session = utils.login('t', 'venice')
+        self.assertEqual(r.status_code, 401)
+
+    def test_create_user_fails_empty_display_name(self):
+        r = utils.create_user('', 't@youfie.io', 'venice')
+        self.assertEqual(r.status_code, 422)
+        self.assertTrue('name' in r.content)
+        self.assertTrue('invalid' in r.content)
+        r, session = utils.login('', 'venice')
+        self.assertEqual(r.status_code, 401)
+
+    def test_delete_user(self):
+        r = utils.create_user('test1', 'test1@youfie.io', 'venice')
+        r, session = utils.login('test1', 'venice')
+        self.assertEqual(r.status_code, 200)
+        r = utils.delete_user('test1', session)
+        self.assertEqual(r.status_code, 200)
+        r, session = utils.login('test1', 'venice')
+        self.assertEqual(r.status_code, 401)
 
 
 class TestUpdateUser(unittest.TestCase):
