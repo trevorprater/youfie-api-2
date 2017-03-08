@@ -40,11 +40,13 @@ func GetPhotoByID(id string, db sqlx.Ext) (*Photo, error) {
 
 func (p *Photo) Insert(db sqlx.Ext) ([]byte, int) {
 	// TODO: process photo content, width, height, validate format, generate id, add lat/lng
+	p.ID = uuid.New()
 	_, err := sqlx.NamedExec(db, `
 		INSERT INTO photos
-		(id, owner_id, format, content, width, height, storage_url, latitude, longitude)
-		VALUES (:id, :owner_id, :format, :content, :width, :height, :storage_url, :latitude, :longitude)`, p)
+		(id, owner_id, format, width, height, storage_url, latitude, longitude)
+		VALUES (:id, :owner_id, :format, :width, :height, :storage_url, :latitude, :longitude)`, p)
 	if err != nil {
+		log.Println("unable to insert photo into DB")
 		log.Println(err)
 		return []byte(err.Error()), http.StatusInternalServerError
 	} else {

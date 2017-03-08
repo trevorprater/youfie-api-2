@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/trevorprater/youfie-api-2/core/authentication"
 	"github.com/trevorprater/youfie-api-2/core/postgres"
 	"github.com/trevorprater/youfie-api-2/services/models"
 )
@@ -33,10 +34,18 @@ func CreatePhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&requestPhoto)
 
-	resp, statusCode := requestPhoto.Insert(postgres.DB())
 	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(statusCode)
-	rw.Write(resp)
+	user, err := authentication.GetUserByToken(r)
+	if err != nil {
+		log.Println("could not get user via token")
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte("could not get user via supplied token"))
+	} else {
+		requestPhoto.OwnerID = user.ID
+		resp, statusCode := requestPhoto.Insert(postgres.DB())
+		rw.WriteHeader(statusCode)
+		rw.Write(resp)
+	}
 }
 
 func GetPhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
