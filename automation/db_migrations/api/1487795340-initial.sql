@@ -6,9 +6,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
     hash TEXT NOT NULL,
-    display_name TEXT NOT NULL,
+    display_name TEXT NOT NULL UNIQUE,
     admin BOOLEAN DEFAULT false,
 
     disabled BOOLEAN DEFAULT false,
@@ -16,9 +16,8 @@ CREATE TABLE users (
 
     last_login TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
 
-    UNIQUE(email, display_name)
 );
 
 CREATE TABLE photos(
