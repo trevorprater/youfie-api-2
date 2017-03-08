@@ -16,7 +16,7 @@ type Photo struct {
 	Format     string  `json:"format" form:"format" db:"format"`
 	Width      int     `json:"width" form:"-" db:"width"`
 	Height     int     `json:"height" form:"-" db:"height"`
-	StorageURL string  `json:"url" form:"-" db:"storage_url"`
+	StorageURL string  `json:"storage_url" form:"storage_url" db:"storage_url"`
 	Latitude   float64 `json:"latitude" form:"latitude" db:"latitude"`
 	Longitude  float64 `json:"longitude" form:"longitude" db:"longitude"`
 	Processed  bool    `json:"processed" form:"-" db:"processed"`
