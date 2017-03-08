@@ -2,10 +2,15 @@
 *.o
 *.a
 *.so
+*.swo
+*.pyc
+*.swp
 
 # Folders
 _obj
 _test
+__pycache__
+.cache
 
 # Architecture specific extensions/prefixes
 *.[568vq]
