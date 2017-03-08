@@ -8,7 +8,6 @@ import (
 )
 
 func SetUserRoutes(router *mux.Router) *mux.Router {
-	// ====================CRUD USER=================================
 	router.HandleFunc("/users", controllers.CreateUser).Methods("POST")
 
 	router.Handle("/users/{display_name}",
@@ -31,7 +30,6 @@ func SetUserRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(controllers.GetUserByDisplayName),
 		)).Methods("GET")
 
-	// ====================LOGIN/LOGOUT/REFRESH-TOKEN========================
 	router.HandleFunc("/users/{display_name}/login", controllers.Login).Methods("POST")
 
 	router.Handle("/users/{display_name}/refresh-token",
