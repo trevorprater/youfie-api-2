@@ -28,7 +28,19 @@ type Photo struct {
 func GetPhotosForUser(userID string, db sqlx.Ext) ([]*Photo, error) {
 	// TODO: GET OFFSET AND LIMIT
 	var photos []*Photo
-	err := sqlx.Get(db, &photos, "SELECT * FROM photos WHERE user_id='"+userID+"'")
+	rows, err := db.Queryx("SELECT * FROM photos WHERE owner_id='" + userID + "'")
+	if err != nil {
+		log.Println(err)
+		return photos, err
+	}
+	for rows.Next() {
+		var p Photo
+		err = rows.StructScan(&p)
+		if err != nil {
+			log.Println(err)
+		}
+		photos = append(photos, &p)
+	}
 	return photos, err
 }
 

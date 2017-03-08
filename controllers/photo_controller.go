@@ -12,18 +12,26 @@ import (
 )
 
 func GetPhotos(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	vars := mux.Vars(r)
-	photos, err := models.GetPhotosForUser(vars["display_name"], postgres.DB())
+	rw.Header().Set("Content-Type", "application/json")
+	user, err := authentication.GetUserByToken(r)
+	if err != nil {
+		log.Println("could not get user from token")
+		rw.WriteHeader(http.StatusUnauthorized)
+		rw.Write([]byte("could not get user from token"))
+		return
+	}
+	photos, err := models.GetPhotosForUser(user.ID, postgres.DB())
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)
+		rw.Write([]byte("could not find user"))
 	}
 	photosJson, err := json.MarshalIndent(&photos, "", "    ")
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte("internal server error"))
 	} else {
-		rw.Header().Set("Content-Type", "application/json")
 		rw.WriteHeader(http.StatusOK)
 		rw.Write(photosJson)
 	}
