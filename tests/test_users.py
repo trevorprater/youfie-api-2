@@ -8,10 +8,12 @@ class TestCreateUserAndLoginLogout(unittest.TestCase):
     def setUp(self):
         utils.delete_user_if_exists('test1', 'venice')
         utils.delete_user_if_exists('test2', 'venice')
+        utils.delete_user_if_exists('test1', 'pass')
 
     def tearDown(self):
         utils.delete_user_if_exists('test1', 'venice')
         utils.delete_user_if_exists('test2', 'venice')
+        utils.delete_user_if_exists('test1', 'pass')
 
     def test_login(self):
         utils.create_user('test1', 'test1@youfie.io', 'venice')
@@ -49,7 +51,13 @@ class TestCreateUserAndLoginLogout(unittest.TestCase):
 
     def test_create_user_fails_no_password(self):
         r = utils.create_user('test1', 'test1@youfie.io', '')
-        self.assertEqual(r.status_code, 500)
+        self.assertEqual(r.status_code, 422)
+        self.assertTrue('password' in r.content.lower())
+
+    def test_create_user_fails_short_password(self):
+        r = utils.create_user('test1', 'test1@youfie.io', 'pass')
+        self.assertEqual(r.status_code, 422)
+        self.assertTrue('password' in r.content.lower())
 
 
 class TestUpdateUser(unittest.TestCase):

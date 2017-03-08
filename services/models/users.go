@@ -49,19 +49,19 @@ func (u *User) Insert(db sqlx.Ext) ([]byte, int) {
 		pwHash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 10)
 		if err != nil {
 			log.Println("could not generate a hash from the password!")
-			return []byte("invalid password provided"), http.StatusInternalServerError
+			return []byte("invalid password provided"), http.StatusUnprocessableEntity
 		}
 		u.PasswordHash = string(pwHash)
 	} else {
-		return []byte("invalid password provided"), http.StatusInternalServerError
+		return []byte("invalid password provided"), http.StatusUnprocessableEntity
 	}
 
 	if !u.isEmailValid() {
-		return []byte("invalid email provided"), http.StatusInternalServerError
+		return []byte("invalid email provided"), http.StatusUnprocessableEntity
 	}
 
 	if !u.isDisplayNameValid() {
-		return []byte("invalid display name provided"), http.StatusInternalServerError
+		return []byte("invalid display name provided"), http.StatusUnprocessableEntity
 	}
 
 	_, err := sqlx.NamedExec(db, `

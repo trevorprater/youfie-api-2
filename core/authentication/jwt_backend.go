@@ -7,6 +7,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -54,26 +55,26 @@ func (backend *JWTAuthenticationBackend) GenerateToken(userID string) (string, e
 	return tokenString, nil
 }
 
-func (backend *JWTAuthenticationBackend) Authenticate(user *models.User, db sqlx.Ext) (*models.User, error) {
+func (backend *JWTAuthenticationBackend) Authenticate(user *models.User, db sqlx.Ext) (*models.User, error, int) {
 	dbUser, err := models.GetUserByDisplayName(user.DisplayName, db)
 	if err != nil {
 		log.Printf("Cannot get user by email: %v, error: %v", user.Email, err.Error())
-		return nil, err
+		return nil, err, http.StatusUnauthorized
 	}
 
 	if dbUser.Disabled {
-		log.Printf("User has been disabled!")
-		return nil, err
+		log.Printf("user has been disabled until %t", dbUser.DisabledUntil)
+		return nil, err, http.StatusUnauthorized
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(dbUser.PasswordHash), []byte(user.Password)) != nil {
 		log.Println("Incorrect password supplied!")
-		return nil, errors.New("incorrect password")
+		return nil, errors.New("incorrect password"), http.StatusUnprocessableEntity
 	}
 	if dbUser.DisplayName == user.DisplayName {
-		return dbUser, nil
+		return dbUser, nil, http.StatusOK
 	}
-	return nil, errors.New("login failed")
+	return nil, errors.New("login failed"), http.StatusInternalServerError
 }
 
 func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp interface{}) int {
