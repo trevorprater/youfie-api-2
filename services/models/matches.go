@@ -25,7 +25,19 @@ type Match struct {
 func GetMatchesForUser(userID string, db sqlx.Ext) ([]*Match, error) {
 	// TODO: GET OFFSET AND LIMIT
 	var matches []*Match
-	err := sqlx.Get(db, &matches, "SELECT * FROM matches WHERE user_id='"+userID+"'")
+	rows, err := db.Queryx("SELECT * FROM matches WHERE user_id='" + userID + "'")
+	if err != nil {
+		log.Println(err)
+		return matches, err
+	}
+	for rows.Next() {
+		var m Match
+		err = rows.StructScan(&m)
+		if err != nil {
+			log.Println(err)
+		}
+		matches = append(matches, &m)
+	}
 	return matches, err
 }
 
