@@ -2,6 +2,7 @@ import os
 from pprint import pprint
 
 PATH = os.getenv("GOPATH") + '/src/github.com/trevorprater/youfie-api-2/routers/'
+endpoint_dict = {}
 for f in os.listdir(PATH):
     routes = []
     methods = []
@@ -16,11 +17,14 @@ for f in os.listdir(PATH):
                 methods = line.split('Methods(')[-1].replace(')', '').replace(
                     '"', '').strip()
             if not route == '' and not methods == '':
-                data.append('endpoint: {},  methods: {}'.format(route, methods))
+                try:
+                    endpoint_dict[route] = endpoint_dict[route] + "," + methods
+                except KeyError as e:
+                    endpoint_dict[route] = methods
+                data.append("'{}': {}".format(route, methods))
                 route = methods = ''
-        if data:
-            print f
-            print '=' * 50
-            for row in data:
-                print row
-    print '\n'
+        #if data:
+            #for row in data:
+            #    print row
+for endpoint  in endpoint_dict.keys():
+    print str(endpoint)+ ": " + ", ".join(endpoint_dict[endpoint].split(','))
