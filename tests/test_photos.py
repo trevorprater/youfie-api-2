@@ -57,3 +57,15 @@ class TestPhoto(unittest.TestCase):
         self.assertEqual(r.status_code, 201)
         r = utils.get_photo('trevor', photo['id'], self.session)
         self.assertEqual(r.status_code, 404)
+
+    def test_get_photos(self):
+        r = utils.create_photo('trevor', self.photo, self.session)
+        photo1 = json.loads(r.content)
+        r = utils.create_photo('trevor', self.photo, self.session)
+        photo2 = json.loads(r.content)
+        r = utils.get_photos('trevor', self.session)
+        self.assertEqual(r.status_code, 200)
+        photos = json.loads(r.content)
+        self.assertEqual(len(photos), 2)
+        utils.delete_photo('trevor', photo1['id'], self.session)
+        utils.delete_photo('trevor', photo2['id'], self.session)
