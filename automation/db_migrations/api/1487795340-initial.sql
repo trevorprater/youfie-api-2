@@ -39,7 +39,7 @@ CREATE TABLE photos(
 CREATE TABLE faces(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     photo_id UUID NOT NULL REFERENCES photos(id),
-    feature_vector DECIMAL[128] NOT NULL,
+    feature_vector TEXT NOT NULL,
 
     bb_top_left_x INT NOT NULL,
     bb_top_left_y INT NOT NULL,

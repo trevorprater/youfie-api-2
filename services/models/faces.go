@@ -11,9 +11,9 @@ import (
 )
 
 type Face struct {
-	ID            string    `json:"id" form:"-" db:"id"`
-	PhotoID       string    `json:"photo_id" form:"photo_id" db:"photo_id"`
-	FeatureVector []float64 `json:"feature_vector" form:"feature_vector" db:"feature_vector"`
+	ID            string `json:"id" form:"-" db:"id"`
+	PhotoID       string `json:"photo_id" form:"photo_id" db:"photo_id"`
+	FeatureVector string `json:"feature_vector" form:"feature_vector" db:"feature_vector"`
 
 	TopLeftX     int `json:"bb_top_left_x" form:"bb_top_left_x" db:"bb_top_left_x"`
 	TopLeftY     int `json:"bb_top_left_y" form:"bb_top_left_y" db:"bb_top_left_y"`
@@ -49,13 +49,12 @@ func GetFacesForPhoto(photoID string, db sqlx.Ext) ([]*Face, error) {
 
 func GetFaceByID(faceID string, db sqlx.Ext) (*Face, error) {
 	var face Face
-	err := sqlx.Get(db, &face, "SELECT * FROM face WHERE id='"+faceID+"'")
+	err := sqlx.Get(db, &face, "SELECT * FROM faces WHERE id='"+faceID+"'")
 	return &face, err
 }
 
 func (f *Face) Insert(photoID, userID string, db sqlx.Ext) ([]byte, int) {
-	faceJson, _ := json.MarshalIndent(&f, "", "    ")
-	log.Println(string(faceJson))
+	f.ID = uuid.New()
 	_, err := sqlx.NamedExec(db, `
 	INSERT INTO faces
 	(id, photo_id, feature_vector, bb_top_left_x, bb_top_left_y, bb_top_right_x, bb_top_right_y, bb_bottom_left_x, bb_bottom_left_y, bb_bottom_right_x, bb_bottom_right_y)
@@ -84,7 +83,7 @@ func (f *Face) Delete(db sqlx.Ext) ([]byte, int) {
 		return []byte("face not found"), http.StatusNotFound
 	}
 	res, err := db.Exec(`
-		DELETE FROM photos WHERE id = $1`, f.ID,
+		DELETE FROM faces WHERE id = $1`, f.ID,
 	)
 	count, err := res.RowsAffected()
 	if err != nil {

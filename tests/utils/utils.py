@@ -17,8 +17,8 @@ PHOTO = {
 }
 
 FACE = {
-    'feature_vector': [round(
-        random.uniform(0.1, 100.0), 6) for _ in xrange(128)],
+    'feature_vector': json.dumps([round(
+        random.uniform(0.1, 100.0), 6) for _ in xrange(128)]),
     'bb_top_left_x': 120,
     'bb_top_left_y': 7,
     'bb_top_right_x': 256,
@@ -42,7 +42,7 @@ def get_face(display_name, photo_id, face_id, session):
 
 def create_face(display_name, photo_id, face, session):
     return session.post(API_URL + '/users/{}/photos/{}/faces'.format(
-        display_name, photo_id, data=json.dumps(face)))
+        display_name, photo_id), data=json.dumps(face))
 
 
 def delete_face(display_name, photo_id, face_id, session):
