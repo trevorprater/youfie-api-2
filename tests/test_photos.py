@@ -3,17 +3,9 @@ import requests
 import json
 from utils import utils
 
-
 class TestPhoto(unittest.TestCase):
     def setUp(self):
-        self.photo = {
-            'format': 'jpg',
-            'storage_url': 'http://i.imgur.com/MsCzsxP.jpg',
-            'latitude': 40.744381,
-            'longitude': -73.987333,
-            'width': 2448,
-            'height': 3264,
-        }
+        self.photo = utils.PHOTO
         utils.create_user('trevor', 'trevor@youfie.io', 'venice')
         r, self.session = utils.login('trevor', 'venice')
 

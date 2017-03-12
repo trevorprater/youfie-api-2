@@ -1,10 +1,53 @@
 import unittest
 import requests
 import json
+import random
 
 API_URL = 'http://localhost:5000'
 TEST_USER = 'trevor'
 TEST_USER_PW = 'venice'
+
+PHOTO = {
+    'format': 'jpg',
+    'storage_url': 'http://i.imgur.com/MsCzsxP.jpg',
+    'latitude': 40.744381,
+    'longitude': -73.987333,
+    'width': 2448,
+    'height': 3264,
+}
+
+FACE = {
+    'feature_vector': [round(
+        random.uniform(0.1, 100.0), 6) for _ in xrange(128)],
+    'bb_top_left_x': 120,
+    'bb_top_left_y': 7,
+    'bb_top_right_x': 256,
+    'bb_top_right_y': 7,
+    'bb_bottom_left_x': 120,
+    'bb_bottom_left_y': 107,
+    'bb_bottom_right_x': 256,
+    'bb_bottom_right_y': 107,
+}
+
+
+def get_faces(display_name, photo_id, session):
+    return session.get(API_URL + '/users/{}/photos/{}/faces'.format(
+        display_name, photo_id))
+
+
+def get_face(display_name, photo_id, face_id, session):
+    return session.get(API_URL + '/users/{}/photos/{}/faces/{}'.format(
+        display_name, photo_id, face_id))
+
+
+def create_face(display_name, photo_id, face, session):
+    return session.post(API_URL + '/users/{}/photos/{}/faces'.format(
+        display_name, photo_id, data=json.dumps(face)))
+
+
+def delete_face(display_name, photo_id, face_id, session):
+    return session.delete(API_URL + '/users/{}/photos/{}/faces/{}'.format(
+        display_name, photo_id, face_id))
 
 
 def get_photos(display_name, session):

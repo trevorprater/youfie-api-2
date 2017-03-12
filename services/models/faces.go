@@ -54,6 +54,8 @@ func GetFaceByID(faceID string, db sqlx.Ext) (*Face, error) {
 }
 
 func (f *Face) Insert(photoID, userID string, db sqlx.Ext) ([]byte, int) {
+	faceJson, _ := json.MarshalIndent(&f, "", "    ")
+	log.Println(string(faceJson))
 	_, err := sqlx.NamedExec(db, `
 	INSERT INTO faces
 	(id, photo_id, feature_vector, bb_top_left_x, bb_top_left_y, bb_top_right_x, bb_top_right_y, bb_bottom_left_x, bb_bottom_left_y, bb_bottom_right_x, bb_bottom_right_y)
