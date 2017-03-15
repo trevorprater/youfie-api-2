@@ -60,8 +60,7 @@ CREATE TABLE matches(
     face_id UUID NOT NULL REFERENCES faces (id),
     user_id UUID NOT NULL REFERENCES users (id),
     confidence DECIMAL,
-    user_ackd BOOLEAN NOT NULL DEFAULT false,
-    confirmed BOOLEAN NOT NULL DEFAULT false,
+    user_acknowledged BOOLEAN NOT NULL DEFAULT false,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp

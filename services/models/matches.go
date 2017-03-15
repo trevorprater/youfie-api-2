@@ -16,7 +16,7 @@ type Match struct {
 	FaceID           string    `json:"face_id" form:"face_id" db:"face_id"`
 	UserID           string    `json:"user_id" form:"user_id" db:"user_id"`
 	Confidence       float64   `json:"confidence" form:"confidence" db:"confidence"`
-	UserAcknowledged bool      `json:"user_ackd" form:"user_ackd" db:"user_ackd"`
+	UserAcknowledged bool      `json:"user_acknowledged" form:"user_acknowledged" db:"user_acknowledged"`
 	Confirmed        bool      `json:"confirmed" form:"confirmed" db:"confirmed"`
 	CreatedAt        time.Time `json:"created_at" form:"created_at" db:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`
