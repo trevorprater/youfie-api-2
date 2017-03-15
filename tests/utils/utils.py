@@ -154,7 +154,7 @@ def update_user(display_name, updates, session):
                        data=json.dumps(updates))
 
 
-def view_user(display_name, session):
+def get_user(display_name, session):
     return session.get(API_URL + '/users/{}'.format(display_name))
 
 

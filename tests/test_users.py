@@ -29,10 +29,10 @@ class TestCreateUserAndLoginLogout(unittest.TestCase):
         utils.create_user('test1', 'test1@youfie.io', 'venice')
         r, session = utils.login('test1', 'venice')
         self.assertEqual(r.status_code, 200)
-        r = utils.view_user('test1', session)
+        r = utils.get_user('test1', session)
         self.assertEqual(r.status_code, 200)
         utils.logout_user('test1', session)
-        r = utils.view_user('test1', session)
+        r = utils.get_user('test1', session)
         self.assertTrue(r.status_code != 200)
 
     def test_create_user(self):
@@ -102,7 +102,7 @@ class TestUpdateUser(unittest.TestCase):
 
     def test_update_user(self):
         r, session = utils.login('test_update', 'venice')
-        initial_user = json.loads(utils.view_user('test_update',
+        initial_user = json.loads(utils.get_user('test_update',
                                                   session).content)
         r = utils.update_user('test_update', {
             'password': 'newpass',
@@ -134,7 +134,7 @@ class TestViewUser(unittest.TestCase):
 
     def test_view_self(self):
         r, session = utils.login('test', 'venice')
-        r = utils.view_user('test', session)
+        r = utils.get_user('test', session)
         self.assertTrue(r.status_code, 200)
         data = json.loads(r.content)
         self.assertTrue(data['display_name'] == 'test')
@@ -142,5 +142,5 @@ class TestViewUser(unittest.TestCase):
 
     def test_view_other(self):
         r, session = utils.login('test', 'venice')
-        r = utils.view_user('test1', session)
+        r = utils.get_user('test1', session)
         self.assertEqual(r.status_code, 401)

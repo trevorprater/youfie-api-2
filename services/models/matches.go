@@ -43,7 +43,7 @@ func GetMatchesForUser(userID string, db sqlx.Ext) ([]*Match, error) {
 
 func GetMatchByID(id string, db sqlx.Ext) (*Match, error) {
 	var match Match
-	err := sqlx.Get(db, &match, "SELECT * FROM match WHERE id='"+id+"'")
+	err := sqlx.Get(db, &match, "SELECT * FROM matches WHERE id='"+id+"'")
 	return &match, err
 }
 
