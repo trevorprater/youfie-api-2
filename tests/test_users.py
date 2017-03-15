@@ -103,7 +103,7 @@ class TestUpdateUser(unittest.TestCase):
     def test_update_user(self):
         r, session = utils.login('test_update', 'venice')
         initial_user = json.loads(utils.get_user('test_update',
-                                                  session).content)
+                                                 session).content)
         r = utils.update_user('test_update', {
             'password': 'newpass',
             'email': 'trevor.prater@gmail.com',

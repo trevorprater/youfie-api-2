@@ -34,8 +34,7 @@ MATCH = {
     'face_id': None,
     'user_id': None,
     'confidence': 0.9,
-    'user_acknowledged': False,
-    'confirmed': False,
+    'is_match': False,
 }
 
 
@@ -46,6 +45,11 @@ def create_match(display_name, match, session):
 
 def get_matches(display_name, session):
     return session.get(API_URL + '/users/{}/matches'.format(display_name))
+
+
+def get_potential_matches(display_name, session):
+    return session.get(API_URL + '/users/{}/matches'.format(display_name),
+                       params={'user_acknowledged': False})
 
 
 def get_match(display_name, match_id, session):

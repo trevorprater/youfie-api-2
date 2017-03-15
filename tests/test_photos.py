@@ -3,6 +3,7 @@ import requests
 import json
 from utils import utils
 
+
 class TestPhoto(unittest.TestCase):
     def setUp(self):
         self.photo = utils.PHOTO

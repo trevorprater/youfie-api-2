@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/trevorprater/youfie-api-2/core/authentication"
@@ -20,7 +21,21 @@ func GetMatches(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 		rw.Write([]byte("could not find user by token"))
 		return
 	}
-	matches, err := models.GetMatchesForUser(user.ID, postgres.DB())
+	var matches []*models.Match
+
+	queryValues := r.URL.Query()
+	varsBytes, _ := json.MarshalIndent(&queryValues, "", "    ")
+	log.Println(string(varsBytes))
+	log.Println(queryValues["user_acknowledged"])
+	if val, ok := queryValues["user_acknowledged"]; ok {
+		if len(val) > 0 && strings.ToLower(string(val[0])) == "false" {
+			matches, err = models.GetPotentialMatchesForUser(user.ID, postgres.DB())
+		} else {
+			matches, err = models.GetMatchesForUser(user.ID, postgres.DB())
+		}
+	} else {
+		matches, err = models.GetMatchesForUser(user.ID, postgres.DB())
+	}
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)

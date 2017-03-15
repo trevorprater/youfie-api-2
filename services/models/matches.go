@@ -16,16 +16,34 @@ type Match struct {
 	FaceID           string    `json:"face_id" form:"face_id" db:"face_id"`
 	UserID           string    `json:"user_id" form:"user_id" db:"user_id"`
 	Confidence       float64   `json:"confidence" form:"confidence" db:"confidence"`
+	IsMatch          bool      `json:"is_match" form:"is_match" db:"is_match"`
 	UserAcknowledged bool      `json:"user_acknowledged" form:"user_acknowledged" db:"user_acknowledged"`
-	Confirmed        bool      `json:"confirmed" form:"confirmed" db:"confirmed"`
 	CreatedAt        time.Time `json:"created_at" form:"created_at" db:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`
+}
+
+func GetPotentialMatchesForUser(userID string, db sqlx.Ext) ([]*Match, error) {
+	var matches []*Match
+	rows, err := db.Queryx("SELECT * FROM matches WHERE user_id='" + userID + "' AND user_acknowledged=false")
+	if err != nil {
+		log.Println(err)
+		return matches, err
+	}
+	for rows.Next() {
+		var m Match
+		err = rows.StructScan(&m)
+		if err != nil {
+			log.Println(err)
+		}
+		matches = append(matches, &m)
+	}
+	return matches, err
 }
 
 func GetMatchesForUser(userID string, db sqlx.Ext) ([]*Match, error) {
 	// TODO: GET OFFSET AND LIMIT
 	var matches []*Match
-	rows, err := db.Queryx("SELECT * FROM matches WHERE user_id='" + userID + "'")
+	rows, err := db.Queryx("SELECT * FROM matches WHERE user_id='" + userID + "' AND is_match=true AND user_acknowledged=true")
 	if err != nil {
 		log.Println(err)
 		return matches, err
@@ -51,8 +69,8 @@ func (m *Match) Insert(db sqlx.Ext) ([]byte, int) {
 	m.ID = uuid.New()
 	_, err := sqlx.NamedExec(db, `
 		INSERT INTO matches
-		(id, photo_id, face_id, user_id, confidence, confirmed)
-		VALUES (:id, :photo_id, :face_id, :user_id, :confidence, :confirmed)`, m)
+		(id, photo_id, face_id, user_id, confidence)
+		VALUES (:id, :photo_id, :face_id, :user_id, :confidence)`, m)
 	if err != nil {
 		log.Println(err)
 		return []byte(err.Error()), http.StatusInternalServerError
@@ -72,19 +90,16 @@ func (m *Match) Insert(db sqlx.Ext) ([]byte, int) {
 }
 
 func (m *Match) Update(db sqlx.Ext, updatedMatch *Match) ([]byte, int) {
-	m.UpdatedAt = time.Now().In(time.UTC)
+	updatedMatch.UpdatedAt = time.Now().In(time.UTC)
+	updatedMatch.ID = m.ID
 
 	q := `
 		UPDATE matches
 		SET updated_at = :updated_at,
-			confirmed = :confirmed,
-			user_ackd = :user_ackd,
+			is_match = :is_match,
+			user_acknowledged = true
 		WHERE id = :id`
-
-	m.Confirmed = updatedMatch.Confirmed
-	m.UserAcknowledged = updatedMatch.UserAcknowledged
-
-	res, err := sqlx.NamedExec(db, q, m)
+	res, err := sqlx.NamedExec(db, q, updatedMatch)
 	if err != nil {
 		log.Println(err)
 		return []byte("unable to update match!"), http.StatusInternalServerError
