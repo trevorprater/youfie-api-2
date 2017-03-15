@@ -103,11 +103,26 @@ class TestMatch(unittest.TestCase):
         r = utils.create_match('trevor', self.match, self.session)
         self.assertEqual(r.status_code, 201)
         match = json.loads(r.content)
+
         r = utils.get_matches('trevor', self.session)
         matches = json.loads(r.content)
         self.assertEqual(len(matches), 0)
+
         r = utils.get_potential_matches('trevor', self.session)
         potential_matches = json.loads(r.content)
         self.assertEqual(len(potential_matches), 1)
+
+        match['user_acknowledged'] = True
+        r = utils.update_match('trevor', match['id'], match, self.session)
+        self.assertEqual(r.status_code, 201)
+
+        r = utils.get_potential_matches('trevor', self.session)
+        potential_matches = json.loads(r.content)
+        self.assertEqual(len(potential_matches), 0)
+
+        r = utils.get_matches('trevor', self.session)
+        matches = json.loads(r.content)
+        self.assertEqual(len(matches), 1)
+
         r = utils.delete_match('trevor', match['id'], self.session)
         self.assertEqual(r.status_code, 201)
