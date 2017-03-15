@@ -29,6 +29,53 @@ FACE = {
     'bb_bottom_right_y': 107,
 }
 
+MATCH = {
+    'id': None,
+    'photo_id': None,
+    'face_id': None,
+    'user_id': None,
+    'confidence': 0.9,
+    'user_acknowledged': False,
+    'confirmed': False,
+}
+
+
+def create_match(display_name, photo_id, face_id, match, session):
+    return session.post(
+        API_URL + '/users/{}/photos/{}/faces/{}/matches'.format(
+            display_name, photo_id, face_id),
+        data=json.dumps(match))
+
+
+def get_matches(display_name, photo_id, face_id, session):
+    return session.get(API_URL + '/users/{}/photos/{}/faces/{}/matches'.format(
+        display_name, photo_id, face_id))
+
+
+def get_match(display_name, photo_id, face_id, match_id, session):
+    return session.get(API_URL +
+                       '/users/{}/photos/{}/faces/{}/matches/{}'.format(
+                           display_name, photo_id, face_id, match_id))
+
+
+def update_match(display_name, photo_id, face_id, match_id, updates, session):
+    return session.put(
+        API_URL + '/users/{}/photos/{}/faces/{}/matches/{}'.format(
+            display_name, photo_id, face_id, match_id),
+        data=json.dumps(updates))
+
+
+def delete_match(display_name, photo_id, face_id, match_id, session):
+    return session.delete(API_URL +
+                          '/users/{}/photos/{}/faces/{}/matches/{}'.format(
+                              display_name, photo_id, face_id, match_id))
+
+
+def create_face(display_name, photo_id, face, session):
+    return session.post(
+        API_URL + '/users/{}/photos/{}/faces'.format(display_name, photo_id),
+        data=json.dumps(face))
+
 
 def get_faces(display_name, photo_id, session):
     return session.get(API_URL + '/users/{}/photos/{}/faces'.format(
@@ -40,14 +87,20 @@ def get_face(display_name, photo_id, face_id, session):
         display_name, photo_id, face_id))
 
 
-def create_face(display_name, photo_id, face, session):
-    return session.post(API_URL + '/users/{}/photos/{}/faces'.format(
-        display_name, photo_id), data=json.dumps(face))
+def update_face(display_name, photo_id, face_id, updates, session):
+    return session.put(API_URL + '/users/{}/photos/{}/faces/{}'.format(
+        display_name, photo_id, face_id),
+                       data=json.dumps(updates))
 
 
 def delete_face(display_name, photo_id, face_id, session):
     return session.delete(API_URL + '/users/{}/photos/{}/faces/{}'.format(
         display_name, photo_id, face_id))
+
+
+def create_photo(display_name, photo, session):
+    return session.post(API_URL + '/users/{}/photos'.format(display_name),
+                        data=json.dumps(photo))
 
 
 def get_photos(display_name, session):
@@ -59,9 +112,10 @@ def get_photo(display_name, photo_id, session):
                                                               photo_id))
 
 
-def create_photo(display_name, photo, session):
-    return session.post(API_URL + '/users/{}/photos'.format(display_name),
-                        data=json.dumps(photo))
+def update_photo(display_name, photo_id, updates, session):
+    return session.put(
+        API_URL + '/users/{}/photos/{}'.format(display_name, photo_id),
+        data=json.dumps(updates))
 
 
 def delete_photo(display_name, photo_id, session):
