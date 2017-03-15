@@ -48,6 +48,7 @@ func GetMatchByID(id string, db sqlx.Ext) (*Match, error) {
 }
 
 func (m *Match) Insert(db sqlx.Ext) ([]byte, int) {
+	m.ID = uuid.New()
 	_, err := sqlx.NamedExec(db, `
 		INSERT INTO matches
 		(id, photo_id, face_id, user_id, confidence, confirmed)
