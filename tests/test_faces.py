@@ -14,14 +14,16 @@ class TestFace(unittest.TestCase):
         self.face['photo_id'] = self.photo['id']
 
     def tearDown(self):
-        #utils.delete_user_if_exists('trevor', 'venice')
-        utils.delete_photo('trevor', self.photo['id'], self.session)
+        utils.delete_user_if_exists('trevor', 'venice')
+        utils.delete_face('trevor', self.face['photo_id'], self.face['id'], self.session)
+        utils.delete_photo('trevor', self.face['photo_id'], self.session)
 
     def test_create_face(self):
         r = utils.create_face('trevor', self.photo['id'], self.face, self.session)
         face = json.loads(r.content)
         self.assertEqual(r.status_code, 201)
         face['feature_vector'] = json.loads(face['feature_vector'])
+        self.face['id'] = face['id']
         self.assertEqual(len(face['feature_vector']), 128)
         self.assertEqual(face['photo_id'], self.photo['id'])
         self.assertEqual(face['photo_id'], self.face['photo_id'])
@@ -33,4 +35,3 @@ class TestFace(unittest.TestCase):
         self.assertEqual(face['bb_bottom_left_y'], 107)
         self.assertEqual(face['bb_bottom_right_x'], 256)
         self.assertEqual(face['bb_bottom_right_y'], 107)
-
