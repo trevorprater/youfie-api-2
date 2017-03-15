@@ -30,7 +30,6 @@ FACE = {
 }
 
 MATCH = {
-    'id': None,
     'photo_id': None,
     'face_id': None,
     'user_id': None,
@@ -40,35 +39,29 @@ MATCH = {
 }
 
 
-def create_match(display_name, photo_id, face_id, match, session):
-    return session.post(
-        API_URL + '/users/{}/photos/{}/faces/{}/matches'.format(
-            display_name, photo_id, face_id),
-        data=json.dumps(match))
+def create_match(display_name, match, session):
+    return session.post(API_URL + '/users/{}/matches'.format(display_name),
+                        data=json.dumps(match))
 
 
-def get_matches(display_name, photo_id, face_id, session):
-    return session.get(API_URL + '/users/{}/photos/{}/faces/{}/matches'.format(
-        display_name, photo_id, face_id))
+def get_matches(display_name, session):
+    return session.get(API_URL + '/users/{}/matches'.format(display_name))
 
 
-def get_match(display_name, photo_id, face_id, match_id, session):
-    return session.get(API_URL +
-                       '/users/{}/photos/{}/faces/{}/matches/{}'.format(
-                           display_name, photo_id, face_id, match_id))
+def get_match(display_name, match_id, session):
+    return session.get(API_URL + '/users/{}/matches/{}'.format(display_name,
+                                                               match_id))
 
 
-def update_match(display_name, photo_id, face_id, match_id, updates, session):
+def update_match(display_name, match_id, updates, session):
     return session.put(
-        API_URL + '/users/{}/photos/{}/faces/{}/matches/{}'.format(
-            display_name, photo_id, face_id, match_id),
+        API_URL + '/users/{}/matches/{}'.format(display_name, match_id),
         data=json.dumps(updates))
 
 
-def delete_match(display_name, photo_id, face_id, match_id, session):
-    return session.delete(API_URL +
-                          '/users/{}/photos/{}/faces/{}/matches/{}'.format(
-                              display_name, photo_id, face_id, match_id))
+def delete_match(display_name, match_id, session):
+    return session.delete(API_URL + '/users/{}/matches/{}'.format(display_name,
+                                                                  match_id))
 
 
 def create_face(display_name, photo_id, face, session):
