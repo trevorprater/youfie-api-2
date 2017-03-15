@@ -20,6 +20,11 @@ func GetFaces(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		rw.Write([]byte("could not get faces for photo"))
 		return
 	}
+	if len(faces) == 0 {
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte("[]"))
+		return
+	}
 	facesJson, err := json.MarshalIndent(&faces, "", "    ")
 	if err != nil {
 		log.Println(err)
