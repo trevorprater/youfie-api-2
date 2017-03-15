@@ -26,6 +26,11 @@ func GetPhotos(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		rw.WriteHeader(http.StatusNotFound)
 		rw.Write([]byte("could not find user"))
 	}
+	if len(photos) == 0 {
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte("[]"))
+		return
+	}
 	photosJson, err := json.MarshalIndent(&photos, "", "    ")
 	if err != nil {
 		log.Println(err)

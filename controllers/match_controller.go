@@ -27,6 +27,11 @@ func GetMatches(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) 
 		rw.Write([]byte("could not find user"))
 		return
 	}
+	if len(matches) == 0 {
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte("[]"))
+		return
+	}
 	matchesJson, err := json.MarshalIndent(&matches, "", "    ")
 	if err != nil {
 		log.Println(err)

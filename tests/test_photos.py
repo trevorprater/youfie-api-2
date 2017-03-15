@@ -49,6 +49,9 @@ class TestPhoto(unittest.TestCase):
         self.assertEqual(r.status_code, 201)
         r = utils.get_photo('trevor', photo['id'], self.session)
         self.assertEqual(r.status_code, 404)
+        r = utils.get_photos('trevor', self.session)
+        photos = json.loads(r.content)
+        self.assertEqual(len(photos), 0)
 
     def test_get_photos(self):
         r = utils.create_photo('trevor', self.photo, self.session)
