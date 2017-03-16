@@ -41,7 +41,6 @@ func GetPotentialMatchesForUser(userID string, db sqlx.Ext) ([]*Match, error) {
 }
 
 func GetMatchesForUser(userID string, db sqlx.Ext) ([]*Match, error) {
-	// TODO: GET OFFSET AND LIMIT
 	var matches []*Match
 	rows, err := db.Queryx("SELECT * FROM matches WHERE user_id='" + userID + "' AND is_match=true AND user_acknowledged=true")
 	if err != nil {

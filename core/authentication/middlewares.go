@@ -119,3 +119,36 @@ func RequireUserLogoutPermission(rw http.ResponseWriter, req *http.Request, next
 		rw.WriteHeader(http.StatusUnauthorized)
 	}
 }
+
+func RequireUserConversationPermission(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	vars := mux.vars(req)
+	user, err := GetUserByToken(req)
+	if err != nil {
+		log.Println(err)
+		rw.WriteHeader(http.StatusUnauthorized)
+	}
+	conversation, err := models.GetConversationByID(vars["conversation_id"], postgres.DB())
+	if err != nil {
+		log.Println(err)
+		rw.WriteHeader(http.StatusNotFound)
+	}
+	if conversation.OwnerID == user.ID {
+		return
+	}
+
+	matches, err := models.GetMatchesForUser(user.ID, postgres.DB())
+	if err != nil {
+		log.Println(err)
+		rw.WriteHeader(http.StatusUnauthorized)
+	}
+
+	for _, conversationParticipant := range conversation.Participants {
+		for _, match := range matches {
+			if match.FaceID == conversationParticipant.FaceID {
+				return
+			}
+		}
+	}
+
+	rw.WriteHeader(http.StatusUnauthorized)
+}

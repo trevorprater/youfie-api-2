@@ -78,7 +78,7 @@ CREATE TABLE conversations(
 
 CREATE TABLE conversation_participants(
     conversation_id UUID PRIMARY KEY REFERENCES conversations (id),
-    user_id UUID NOT NULL REFERENCES users (id),
+    face_id UUID NOT NULL REFERENCES faces (id),
     user_approved BOOLEAN DEFAULT false,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp

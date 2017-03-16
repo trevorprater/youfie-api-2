@@ -29,7 +29,6 @@ type Face struct {
 }
 
 func GetFacesForPhoto(photoID string, db sqlx.Ext) ([]*Face, error) {
-	// TODO: GET OFFSET AND LIMIT
 	var faces []*Face
 	rows, err := db.Queryx("SELECT * FROM faces WHERE photo_id='" + photoID + "'")
 	if err != nil {

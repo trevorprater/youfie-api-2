@@ -17,13 +17,12 @@ func CreateConversation(rw http.ResponseWriter, r *http.Request, next http.Handl
 	decoder.Decode(&requestConversation)
 
 	rw.Header().Set("Content-Type", "application/json")
-	users, err := authentication.GetUserByToken(r)
+	user, err := authentication.GetUserByToken(r)
 	if err != nil {
 		log.Println("could not get user via token")
 		rw.WriteHeader(http.StatusUnauthorized)
 		rw.Write([]byte("could not get user via supplied token")
 	} else {
-		requestConversation.OwnerID = user.ID
 		resp, statusCode, := requestConversation.Insert(postgres.DB())
 		rw.WriteHeader(statusCode)
 		rw.Write(resp)
@@ -93,7 +92,7 @@ func UpdateConversation(rw http.ResponseWriter, r *http.Request, next http.Handl
 		rw.WriteHeader(http.StatusNotFound)
 		rw.Write([]byte("cannot find conversation"))
 	} else {
-		resp, statusCode := dbConversation.Update(db, updateConversation)
+		resp, statusCode := dbConversation.Update(db, updateConversation.MessageText)
 		rw.WriteHeader(statusCode)
 		rw.Write(resp)
 	}

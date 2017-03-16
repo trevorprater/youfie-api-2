@@ -26,6 +26,7 @@ func SetConversationRoutes(router *mux.Router) *mux.Router {
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserWritePermission),
+			negroni.HandlerFunc(authentication.RequireUserConversationPermission),
 			negroni.HandlerFunc(controllers.GetConversation),
 		)).Methods("GET")
 
@@ -33,6 +34,7 @@ func SetConversationRoutes(router *mux.Router) *mux.Router {
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserWritePermission),
+			negroni.HandlerFunc(authentication.RequireUserConversationPermission),
 			negroni.HandlerFunc(controllers.UpdateConversation),
 		)).Methods("PUT")
 
@@ -40,6 +42,7 @@ func SetConversationRoutes(router *mux.Router) *mux.Router {
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserWritePermission),
+			negroni.HandlerFunc(authentication.RequireUserConversationPermission),
 			negroni.HandlerFunc(controllers.DeleteConversation),
 		)).Methods("DELETE")
 
