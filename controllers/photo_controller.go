@@ -67,6 +67,7 @@ func GetPhoto(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)
+		return
 	}
 	photoJson, err := json.MarshalIndent(&photo, "", "    ")
 	if err != nil {

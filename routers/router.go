@@ -10,5 +10,6 @@ func InitRoutes() *mux.Router {
 	router = SetPhotoRoutes(router)
 	router = SetFaceRoutes(router)
 	router = SetMatchRoutes(router)
+	router = SetConversationRoutes(router)
 	return router
 }

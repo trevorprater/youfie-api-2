@@ -62,7 +62,34 @@ CREATE TABLE matches(
     confidence DECIMAL,
     is_match BOOLEAN NOT NULL DEFAULT true,
     user_acknowledged BOOLEAN NOT NULL DEFAULT false,
+
     created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
 );
 
+CREATE TABLE conversations(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    photo_id UUID NOT NULL REFERENCES photos (id),
+    owner_id UUID NOT NULL REFERENCES users (id),
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
+);
+
+CREATE TABLE conversation_participants(
+    conversation_id UUID PRIMARY KEY REFERENCES conversations (id),
+    user_id UUID NOT NULL REFERENCES users (id),
+    user_approved BOOLEAN DEFAULT false,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
+);
+
+CREATE TABLE conversation_messages(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    conversation_id UUID NOT NULL REFERENCES conversations (id),
+    owner_id UUID NOT NULL REFERENCES users (id),
+    message_text TEXT NOT NULL,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp
+);
