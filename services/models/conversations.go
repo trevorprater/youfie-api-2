@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -18,9 +19,10 @@ type Conversation struct {
 	CreatedAt time.Time `json:"created_at" form:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`
 
-	FaceIDs     []string                   `json:"face_ids" form:"face_ids" db:"-"`
-	Paricipants []*ConversationParticipant `json:"participants" form:"participants" db:"-"`
-	Messages    []*ConversationMessage     `json:"messages" form:"messages" db:"-"`
+	FaceIDs      []string                   `json:"face_ids" form:"face_ids" db:"-"`
+	Participants []*ConversationParticipant `json:"participants" form:"participants" db:"-"`
+	Messages     []*ConversationMessage     `json:"messages" form:"messages" db:"-"`
+	MessageText  string                     `json:"message_text" form:"message_text" db:"-"`
 }
 
 type ConversationParticipant struct {
@@ -39,7 +41,7 @@ type ConversationMessage struct {
 }
 
 func (m *ConversationMessage) Insert(db sqlx.Ext) error {
-	r.ID = uuid.New()
+	m.ID = uuid.New()
 	q := `INSERT INTO conversation_messages(id, conversation_id, face_id, message_text) VALUES (
 		    :id,
 			:conversation_id,
@@ -60,7 +62,7 @@ func (m *ConversationMessage) Insert(db sqlx.Ext) error {
 func getMessage(messageID string, db sqlx.Ext) (*ConversationMessage, error) {
 	var message *ConversationMessage
 	err := sqlx.Get(db, &message, "SELECT * FROM conversation_messages WHERE id = '"+messageID+"'")
-	return &message, err
+	return message, err
 }
 
 func (c *Conversation) populate(db sqlx.Ext) error {
@@ -116,7 +118,7 @@ func (c *Conversation) populateParticipants(db sqlx.Ext) error {
 }
 
 func (c *Conversation) populateOwnerID(db sqlx.Ext) error {
-	photo, err := GetPhotoByID(c.PhotoID)
+	photo, err := GetPhotoByID(c.PhotoID, db)
 	if err != nil {
 		log.Println(err)
 	}
@@ -139,7 +141,7 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 			log.Println(err)
 		}
 
-		err = c.populateParcipants()
+		err = c.populateParticipants(db)
 		if err != nil {
 			log.Println(err)
 		}
@@ -147,7 +149,7 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 	}
 
 	// Get all conversations the user's face appears in
-	rows, err = db.QueryX("SELECT * FROM matches WHERE user_id = '" + userID + "' AND is_match=true")
+	rows, err = db.Queryx("SELECT * FROM matches WHERE user_id = '" + userID + "' AND is_match=true")
 	if err != nil {
 		log.Println(err)
 		return conversations, err
@@ -159,7 +161,7 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 			log.Println(err)
 			return conversations, err
 		}
-		rows, err = db.QueryX("SELECT * FROM conversation_participants WHERE face_id='" + m.FaceID + "'")
+		rows, err = db.Queryx("SELECT * FROM conversation_participants WHERE face_id='" + m.FaceID + "'")
 		if err != nil {
 			log.Println(err)
 			return conversations, err
@@ -176,12 +178,12 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 				log.Println(err)
 				return conversations, err
 			}
-			err = conversation.populateParticipants()
+			err = c.populateParticipants(db)
 			if err != nil {
 				log.Println(err)
 				return conversations, err
 			}
-			conversations = append(conversations, &c)
+			conversations = append(conversations, c)
 		}
 	}
 
@@ -193,18 +195,18 @@ func GetConversationByID(id string, db sqlx.Ext) (*Conversation, error) {
 	err := sqlx.Get(db, &conversation, "SELECT * FROM conversations WHERE id = '"+id+"'")
 	if err != nil {
 		log.Println(err)
-		return conversation, err
+		return &conversation, err
 	}
-	err = conversation.populateParticipants()
+	err = conversation.populateParticipants(db)
 	if err != nil {
 		log.Println(err)
-		return conversation, err
+		return &conversation, err
 	}
-	err = conversation.populateMessages()
+	err = conversation.populateMessages(db)
 	if err != nil {
 		log.Println(err)
 	}
-	return conversation, err
+	return &conversation, err
 }
 
 func (c *Conversation) Update(db sqlx.Ext, messageText string) ([]byte, int) {
@@ -223,7 +225,7 @@ func (c *Conversation) Update(db sqlx.Ext, messageText string) ([]byte, int) {
 		return []byte("internal server error"), http.StatusInternalServerError
 	}
 
-	_, err := sqlx.NamedExec(db, `
+	_, err = sqlx.NamedExec(db, `
 		UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = :id`, c.ID)
 	if err != nil {
 		log.Println(err)
@@ -235,7 +237,7 @@ func (c *Conversation) Update(db sqlx.Ext, messageText string) ([]byte, int) {
 		log.Println(err)
 		return []byte("internal server error"), http.StatusInternalServerError
 	}
-	err = conversation.populate()
+	err = conversation.populate(db)
 	if err != nil {
 		log.Println(err)
 		return []byte("internal server error"), http.StatusInternalServerError
@@ -246,7 +248,7 @@ func (c *Conversation) Update(db sqlx.Ext, messageText string) ([]byte, int) {
 
 func (c *Conversation) Insert(db sqlx.Ext) ([]byte, int) {
 	c.ID = uuid.New()
-	err := c.populateOwnerID()
+	err := c.populateOwnerID(db)
 	if err != nil {
 		return []byte("internal server error"), http.StatusInternalServerError
 	}
@@ -266,12 +268,12 @@ func (c *Conversation) Insert(db sqlx.Ext) ([]byte, int) {
 	}
 
 	for _, face_id_in_request := range c.FaceIDs {
-		for _, face_id_in_photo := range faces {
-			if face_id_in_request == face_id_in_photo {
+		for _, face_in_photo := range faces {
+			if face_id_in_request == face_in_photo.ID {
 				var p ConversationParticipant
 				p.UserApproved = false
 				p.ConversationID = c.ID
-				p.FaceID = face_id
+				p.FaceID = face_in_photo.ID
 
 				_, err := sqlx.NamedExec(db, `INSERT INTO conversation_participants(conversation_id, face_id, user_approved)
 				VALUES (:conversation_id, :face_id, :user_approved)`, p)
@@ -289,12 +291,12 @@ func (c *Conversation) Insert(db sqlx.Ext) ([]byte, int) {
 		log.Println(err)
 		return []byte("internal server error"), http.StatusInternalServerError
 	}
-	conversationJson, err := json.MarhsalIndent(&conversation, "", "    ")
+	conversationJson, err := json.MarshalIndent(&conversation, "", "    ")
 	if err != nil {
 		log.Println(err)
 		return []byte("internal server error"), http.StatusInternalServerError
 	}
-	return conversationJson, err
+	return conversationJson, http.StatusCreated
 }
 
 func (c *Conversation) Delete(db sqlx.Ext) ([]byte, int) {
@@ -311,7 +313,7 @@ func (c *Conversation) Delete(db sqlx.Ext) ([]byte, int) {
 		return []byte("internal server error"), http.StatusInternalServerError
 	}
 
-	_, err := db.Exec(`
+	_, err = db.Exec(`
 		DELETE FROM conversation_participants WHERE conversation_id = $1`, c.ID,
 	)
 	if err != nil {

@@ -18,6 +18,7 @@ func CreateConversation(rw http.ResponseWriter, r *http.Request, next http.Handl
 
 	rw.Header().Set("Content-Type", "application/json")
 	user, err := authentication.GetUserByToken(r)
+	requestConversation.OwnerID = user.ID
 	if err != nil {
 		log.Println("could not get user via token")
 		rw.WriteHeader(http.StatusUnauthorized)
@@ -83,7 +84,7 @@ func GetConversation(rw http.ResponseWriter, r *http.Request, next http.HandlerF
 func UpdateConversation(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	vars := mux.Vars(r)
 	rw.Header().Set("Content-Type", "application/json")
-	updateConversation := new(models.ConversationHttpResp)
+	updateConversation := new(models.Conversation)
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&updateConversation)
 	db := postgres.DB()

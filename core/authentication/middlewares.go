@@ -121,7 +121,7 @@ func RequireUserLogoutPermission(rw http.ResponseWriter, req *http.Request, next
 }
 
 func RequireUserConversationPermission(rw http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
-	vars := mux.vars(req)
+	vars := mux.Vars(req)
 	user, err := GetUserByToken(req)
 	if err != nil {
 		log.Println(err)
