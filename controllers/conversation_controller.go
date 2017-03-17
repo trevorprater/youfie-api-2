@@ -21,9 +21,9 @@ func CreateConversation(rw http.ResponseWriter, r *http.Request, next http.Handl
 	if err != nil {
 		log.Println("could not get user via token")
 		rw.WriteHeader(http.StatusUnauthorized)
-		rw.Write([]byte("could not get user via supplied token")
+		rw.Write([]byte("could not get user via supplied token"))
 	} else {
-		resp, statusCode, := requestConversation.Insert(postgres.DB())
+		resp, statusCode := requestConversation.Insert(postgres.DB())
 		rw.WriteHeader(statusCode)
 		rw.Write(resp)
 	}
@@ -42,7 +42,7 @@ func GetConversations(rw http.ResponseWriter, r *http.Request, next http.Handler
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)
-		rw.Write([]byte("could not find user")
+		rw.Write([]byte("could not find user"))
 	}
 	if len(conversations) == 0 {
 		rw.WriteHeader(http.StatusOK)
@@ -101,7 +101,7 @@ func UpdateConversation(rw http.ResponseWriter, r *http.Request, next http.Handl
 func DeleteConversation(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	vars := mux.Vars(r)
 	rw.Header().Set("Content-Type", "application/json")
-	conversation, err := models.GetConversationByID(vars["conversation_id"}, postgres.DB())
+	conversation, err := models.GetConversationByID(vars["conversation_id"], postgres.DB())
 	if err != nil {
 		log.Println(err)
 		rw.WriteHeader(http.StatusNotFound)

@@ -8,14 +8,14 @@ import (
 )
 
 func SetConversationRoutes(router *mux.Router) *mux.Router {
-	router.Handle("/users/{display_name}/conversations"
+	router.Handle("/users/{display_name}/conversations",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserWritePermission),
 			negroni.HandlerFunc(controllers.CreateConversation),
 		)).Methods("POST")
 
-	router.Handle("/users/{display_name}/conversations"
+	router.Handle("/users/{display_name}/conversations",
 		negroni.New(
 			negroni.HandlerFunc(authentication.RequireTokenAuthentication),
 			negroni.HandlerFunc(authentication.RequireUserWritePermission),

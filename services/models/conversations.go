@@ -1,31 +1,41 @@
 package models
 
+import (
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/pborman/uuid"
+	"github.com/trevorprater/youfie-api-2/core/etc"
+)
+
 type Conversation struct {
-	ID string `json:"id" form:"id" db:"id"`
+	ID      string `json:"id" form:"id" db:"id"`
 	OwnerID string `json:"owner_id" form:"owner_id" db:"owner_id"`
 	PhotoID string `json:"photo_id" form:"photo_id" db:"photo_id"`
 
 	CreatedAt time.Time `json:"created_at" form:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" form:"updated_at" db:"updated_at"`
 
-	FaceIDs []string `json:"face_ids" form:"face_ids" db:"-"`
+	FaceIDs     []string                   `json:"face_ids" form:"face_ids" db:"-"`
 	Paricipants []*ConversationParticipant `json:"participants" form:"participants" db:"-"`
-	Messages []*ConversationMessage `json:"messages" form:"messages" db:"-"`
+	Messages    []*ConversationMessage     `json:"messages" form:"messages" db:"-"`
 }
 
 type ConversationParticipant struct {
 	ConversationID string `json:"-" form:"-" db:"conversation_id"`
-	FaceID string `json:"-" form:"-" db:"face_id"`
-	UserApproved bool `json:"-" form:"-" db:"user_approved"`
+	FaceID         string `json:"-" form:"-" db:"face_id"`
+	UserApproved   bool   `json:"-" form:"-" db:"user_approved"`
 
 	CreatedAt time.Time `json"created_at" form:"created_at" db:"created_at"`
 }
 
 type ConversationMessage struct {
-	ID string `json:"id" form:"id" db:"id"`
+	ID             string `json:"id" form:"id" db:"id"`
 	ConversationID string `json:"-" form:"-" db:"conversation_id"`
-	OwnerID string `json:"-" form:"-" db:"owner_id"`
-	MessageText string `json:"message_text" form:"message_text" db:"message_text"`
+	OwnerID        string `json:"-" form:"-" db:"owner_id"`
+	MessageText    string `json:"message_text" form:"message_text" db:"message_text"`
 }
 
 func (m *ConversationMessage) Insert(db sqlx.Ext) error {
@@ -49,7 +59,7 @@ func (m *ConversationMessage) Insert(db sqlx.Ext) error {
 
 func getMessage(messageID string, db sqlx.Ext) (*ConversationMessage, error) {
 	var message *ConversationMessage
-	err := sqlx.Get(db, &message, "SELECT * FROM conversation_messages WHERE id = '" + messageID + "'")
+	err := sqlx.Get(db, &message, "SELECT * FROM conversation_messages WHERE id = '"+messageID+"'")
 	return &message, err
 }
 
@@ -105,7 +115,7 @@ func (c *Conversation) populateParticipants(db sqlx.Ext) error {
 	return err
 }
 
-func (c *Conversation) populateOwnerID(db sqlx.Ext) (error) {
+func (c *Conversation) populateOwnerID(db sqlx.Ext) error {
 	photo, err := GetPhotoByID(c.PhotoID)
 	if err != nil {
 		log.Println(err)
@@ -114,8 +124,6 @@ func (c *Conversation) populateOwnerID(db sqlx.Ext) (error) {
 	return err
 }
 
-
-
 func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error) {
 	// Get all conversations created by the requesting user.
 	var conversations []*Conversation
@@ -123,7 +131,8 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 	if err != nil {
 		log.Println(err)
 		return conversations, err
-	} for rows.Next() {
+	}
+	for rows.Next() {
 		var c Conversation
 		err = rows.StructScan(&c)
 		if err != nil {
@@ -142,7 +151,8 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 	if err != nil {
 		log.Println(err)
 		return conversations, err
-	} for rows.Next() {
+	}
+	for rows.Next() {
 		var m Match
 		err = rows.StructScan(&m)
 		if err != nil {
@@ -153,7 +163,8 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 		if err != nil {
 			log.Println(err)
 			return conversations, err
-		} for rows.Next() {
+		}
+		for rows.Next() {
 			var p ConversationParticipant
 			err = rows.StructScan(&p)
 			if err != nil {
@@ -179,7 +190,7 @@ func GetConversationsForUser(userID string, db sqlx.Ext) ([]*Conversation, error
 
 func GetConversationByID(id string, db sqlx.Ext) (*Conversation, error) {
 	var conversation Conversation
-	err := sqlx.Get(db, &conversation, "SELECT * FROM conversations WHERE id = '"+id"'")
+	err := sqlx.Get(db, &conversation, "SELECT * FROM conversations WHERE id = '"+id+"'")
 	if err != nil {
 		log.Println(err)
 		return conversation, err
@@ -189,10 +200,9 @@ func GetConversationByID(id string, db sqlx.Ext) (*Conversation, error) {
 		log.Println(err)
 		return conversation, err
 	}
-	err = conversation.populateMessages() {
-		if err != nil {
-			log.Println(err)
-		}
+	err = conversation.populateMessages()
+	if err != nil {
+		log.Println(err)
 	}
 	return conversation, err
 }
@@ -323,5 +333,3 @@ func (c *Conversation) Delete(db sqlx.Ext) ([]byte, int) {
 	}
 	return []byte("conversation deleted"), http.StatusCreated
 }
-
-
