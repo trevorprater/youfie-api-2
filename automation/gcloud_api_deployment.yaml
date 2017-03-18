@@ -1,16 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: youfie-api
+  labels:
+    app: youfie-api
+    tier: backend
+spec:
+    type: LoadBalancer
+    ports:
+    - port: 80
+    selector:
+      app: youfie-api
+      tier: backend
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: youfie-frontend
+  name: youfie-api
 spec:
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
-        app: youfie-frontend
+        app: youfie-api
+        tier: backend
     spec:
       containers:
-        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:rtp
+        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:rtpr4
           name: web
           env:
             - name: GET_HOSTS_FROM
@@ -49,7 +65,6 @@ spec:
             # [END cloudsql_secrets]
           ports:
             - containerPort: 80
-              name: youfie-frontend
         # Change [INSTANCE_CONNECTION_NAME] here to include your GCP
         # project, the region of your Cloud SQL instance and the name
         # of your Cloud SQL instance. The format is
