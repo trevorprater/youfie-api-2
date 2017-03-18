@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"os"
+
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -15,7 +17,7 @@ func Connect() (conn *RedisCli) {
 		instanceRedisCli = new(RedisCli)
 		var err error
 
-		instanceRedisCli.conn, err = redis.Dial("tcp", ":6379")
+		instanceRedisCli.conn, err = redis.Dial("tcp", os.Getenv("YOUFIE_REDIS_ADDR"))
 
 		if err != nil {
 			panic(err)
