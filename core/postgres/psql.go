@@ -25,7 +25,7 @@ func dbConnectionString() (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to parse DB host and port: %v", dbAddr)
 	}
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s, dbname=youfie sslmode=disable", host, port, dbUser, dbPassword), nil
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s, dbname=youfie", host, port, dbUser, dbPassword), nil
 }
 
 func connectDB() (*sqlx.DB, error) {
