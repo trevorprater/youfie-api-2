@@ -1,11 +1,7 @@
-DROP SCHEMA PUBLIC CASCADE;
-
-CREATE SCHEMA PUBLIC;
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT NOT NULL UNIQUE,
     hash TEXT NOT NULL,
     display_name TEXT NOT NULL UNIQUE,
@@ -21,7 +17,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE photos(
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     owner_id UUID REFERENCES users (id),
     format TEXT NOT NULL,
     width INT NOT NULL,
@@ -37,7 +33,7 @@ CREATE TABLE photos(
 );
 
 CREATE TABLE faces(
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     photo_id UUID NOT NULL REFERENCES photos(id),
     feature_vector TEXT NOT NULL,
 
@@ -55,7 +51,7 @@ CREATE TABLE faces(
 );
 
 CREATE TABLE matches(
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     photo_id UUID NOT NULL REFERENCES photos (id),
     face_id UUID NOT NULL REFERENCES faces (id),
     user_id UUID NOT NULL REFERENCES users (id),
@@ -68,7 +64,7 @@ CREATE TABLE matches(
 );
 
 CREATE TABLE conversations(
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     photo_id UUID NOT NULL REFERENCES photos (id),
     owner_id UUID NOT NULL REFERENCES users (id),
 
@@ -85,7 +81,7 @@ CREATE TABLE conversation_participants(
 );
 
 CREATE TABLE conversation_messages(
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     conversation_id UUID NOT NULL REFERENCES conversations (id),
     owner_id UUID NOT NULL REFERENCES users (id),
     message_text TEXT NOT NULL,
