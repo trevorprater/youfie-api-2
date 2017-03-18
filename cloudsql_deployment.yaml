@@ -10,7 +10,7 @@ spec:
         app: youfie-frontend
     spec:
       containers:
-        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2
+        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:latest
           name: web
           env:
             - name: YOUFIE_DB_HOST
