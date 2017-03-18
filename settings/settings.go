@@ -17,6 +17,7 @@ func LoadSettings() {
 	settings = Settings{}
 	settings.PrivateKey = []byte(os.Getenv("YOUFIE_PRIVATE_KEY"))
 	settings.PublicKey = []byte(os.Getenv("YOUFIE_PUBLIC_KEY"))
+	settings.JWTExpirationDelta = 72
 
 	if len(settings.PrivateKey) == 0 || len(settings.PublicKey) == 0 {
 		log.Println("ENV VARS 'YOUFIE_PRIVATE_KEY' and/or 'YOUFIE_PUBLIC_KEY' are not set!")
