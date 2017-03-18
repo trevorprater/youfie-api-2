@@ -1,5 +1,5 @@
 FROM scratch
-ADD youfie /
+ADD bin/youfie /
 
 CMD ["/youfie"]
 
