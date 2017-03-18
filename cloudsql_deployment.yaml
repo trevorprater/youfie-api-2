@@ -10,7 +10,7 @@ spec:
         app: youfie-frontend
     spec:
       containers:
-        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:masterx
+        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:master
           name: web
           env:
             - name: YOUFIE_DB_ADDR
