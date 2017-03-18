@@ -64,8 +64,8 @@ def update_match(display_name, match_id, updates, session):
 
 
 def delete_match(display_name, match_id, session):
-    return session.delete(API_URL + '/users/{}/matches/{}/'.format(display_name,
-                                                                  match_id))
+    return session.delete(API_URL + '/users/{}/matches/{}/'.format(
+        display_name, match_id))
 
 
 def create_face(display_name, photo_id, face, session):
@@ -106,7 +106,7 @@ def get_photos(display_name, session):
 
 def get_photo(display_name, photo_id, session):
     return session.get(API_URL + '/users/{}/photos/{}/'.format(display_name,
-                                                              photo_id))
+                                                               photo_id))
 
 
 def update_photo(display_name, photo_id, updates, session):
@@ -117,7 +117,7 @@ def update_photo(display_name, photo_id, updates, session):
 
 def delete_photo(display_name, photo_id, session):
     return session.delete(API_URL + '/users/{}/photos/{}/'.format(display_name,
-                                                                 photo_id))
+                                                                  photo_id))
 
 
 def login(display_name, pw):
