@@ -30,7 +30,7 @@ func SetUserRoutes(router *mux.Router) *mux.Router {
 			negroni.HandlerFunc(controllers.GetUserByDisplayName),
 		)).Methods("GET")
 
-	router.HandleFunc("/api/v1/users/{display_name}/login/", controllers.Login).Methods("POST")
+	router.HandleFunc("/api/v1/users/{display_name}/login", controllers.Login).Methods("POST")
 
 	router.Handle("/api/v1/users/{display_name}/refresh-token/",
 		negroni.New(
