@@ -8,7 +8,7 @@ import (
 )
 
 func SetUserRoutes(router *mux.Router) *mux.Router {
-	router.HandleFunc("/users", controllers.CreateUser).Methods("POST")
+	router.HandleFunc("/api/v1/users/", controllers.CreateUser).Methods("POST")
 
 	router.Handle("/api/v1/users/{display_name}/",
 		negroni.New(
