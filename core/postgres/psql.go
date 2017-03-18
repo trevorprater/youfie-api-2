@@ -19,12 +19,13 @@ var (
 func dbConnectionString() (string, error) {
 	dbAddr := os.Getenv("YOUFIE_DB_ADDR")
 	dbUser := os.Getenv("YOUFIE_DB_USER")
+	dbPassword := os.Getenv("YOUFIE_DB_PASSWORD")
 
 	host, port, err := net.SplitHostPort(dbAddr)
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to parse DB host and port: %v", dbAddr)
 	}
-	return fmt.Sprintf("host=%s port=%s user=%s dbname=youfie sslmode=disable", host, port, dbUser), nil
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s, dbname=youfie sslmode=disable", host, port, dbUser, dbPassword), nil
 }
 
 func connectDB() (*sqlx.DB, error) {
