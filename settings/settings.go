@@ -1,59 +1,31 @@
 package settings
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
+	"log"
 	"os"
 )
 
-var environments = map[string]string{
-	"production":    "settings/prod.json",
-	"preproduction": "settings/pre.json",
-	"tests":         "../../settings/tests.json",
-}
-
 type Settings struct {
-	PrivateKeyPath     string
-	PublicKeyPath      string
+	PrivateKey         []byte
+	PublicKey          []byte
 	JWTExpirationDelta int
 }
 
 var settings Settings = Settings{}
-var env = "preproduction"
 
-func Init() {
-	env = os.Getenv("GO_ENV")
-	if env == "" {
-		fmt.Println("Warning: Setting preproduction environment due to lack of GO_ENV value")
-		env = "preproduction"
-	}
-	LoadSettingsByEnv(env)
-}
-
-func LoadSettingsByEnv(env string) {
-	content, err := ioutil.ReadFile(environments[env])
-	if err != nil {
-		fmt.Println("Error while reading config file", err)
-	}
+func LoadSettings() {
 	settings = Settings{}
-	jsonErr := json.Unmarshal(content, &settings)
-	if jsonErr != nil {
-		fmt.Println("Error while parsing config file", jsonErr)
-	}
-}
+	settings.PrivateKey = []byte(os.Getenv("YOUFIE_PRIVATE_KEY"))
+	settings.PublicKey = []byte(os.Getenv("YOUFIE_PUBLIC_KEY"))
 
-func GetEnvironment() string {
-	return env
+	if len(settings.PrivateKey) == 0 || len(settings.PublicKey) == 0 {
+		log.Println("ENV VARS 'YOUFIE_PRIVATE_KEY' and/or 'YOUFIE_PUBLIC_KEY' are not set!")
+	}
 }
 
 func Get() Settings {
 	if &settings == nil {
-		Init()
+		LoadSettings()
 	}
 	return settings
-}
-
-func IsTestEnvironment() bool {
-	return env == "tests"
 }

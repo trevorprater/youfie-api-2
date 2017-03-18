@@ -19,7 +19,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	settings.Init()
+	settings.LoadSettings()
 	router := routers.InitRoutes()
 	n := negroni.Classic()
 	n.UseHandler(router)

@@ -10,13 +10,14 @@ spec:
         app: youfie-frontend
     spec:
       containers:
-        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:master
+        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:masterx
           name: web
           env:
             - name: YOUFIE_DB_ADDR
               # Connect to the SQL proxy over the local network on a fixed port.
               # Insert the port number used by your database. 
               value: 0.0.0.0:5432
+
             # These secrets are required to start the pod.
             # [START cloudsql_secrets]
             - name: YOUFIE_DB_PASSWORD
@@ -29,6 +30,19 @@ spec:
                 secretKeyRef:
                   name: cloudsql
                   key: username
+
+            - name: YOUFIE_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: youfiekeys
+                  key: privatekey
+
+            - name: YOUFIE_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: youfiekeys
+                  key: publickey
+
             # [END cloudsql_secrets]
           ports:
             - containerPort: 80

@@ -1,14 +1,12 @@
 package authentication
 
 import (
-	"bufio"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -123,22 +121,7 @@ func (backend *JWTAuthenticationBackend) IsInBlacklist(token string) bool {
 }
 
 func getPrivateKey() *rsa.PrivateKey {
-	privateKeyFile, err := os.Open(os.Getenv("GOPATH") + settings.Get().PrivateKeyPath)
-	if err != nil {
-		panic(err)
-	}
-
-	pemfileinfo, _ := privateKeyFile.Stat()
-	var size int64 = pemfileinfo.Size()
-	pembytes := make([]byte, size)
-
-	buffer := bufio.NewReader(privateKeyFile)
-	_, err = buffer.Read(pembytes)
-
-	data, _ := pem.Decode([]byte(pembytes))
-
-	privateKeyFile.Close()
-
+	data, _ := pem.Decode([]byte(settings.Get().PrivateKey))
 	privateKeyImported, err := x509.ParsePKCS1PrivateKey(data.Bytes)
 
 	if err != nil {
@@ -149,22 +132,7 @@ func getPrivateKey() *rsa.PrivateKey {
 }
 
 func getPublicKey() *rsa.PublicKey {
-	publicKeyFile, err := os.Open(os.Getenv("GOPATH") + settings.Get().PublicKeyPath)
-	if err != nil {
-		panic(err)
-	}
-
-	pemfileinfo, _ := publicKeyFile.Stat()
-	var size int64 = pemfileinfo.Size()
-	pembytes := make([]byte, size)
-
-	buffer := bufio.NewReader(publicKeyFile)
-	_, err = buffer.Read(pembytes)
-
-	data, _ := pem.Decode([]byte(pembytes))
-
-	publicKeyFile.Close()
-
+	data, _ := pem.Decode([]byte(settings.Get().PublicKey))
 	publicKeyImported, err := x509.ParsePKIXPublicKey(data.Bytes)
 
 	if err != nil {
