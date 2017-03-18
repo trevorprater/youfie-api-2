@@ -16,8 +16,16 @@ func Connect() (conn *RedisCli) {
 	if instanceRedisCli == nil {
 		instanceRedisCli = new(RedisCli)
 		var err error
+		redisAddr := os.Getenv("YOUFIE_REDIS_ADDR")
+		if len(redisAddr) == 0 {
+			if os.Getenv("GET_HOSTS_FROM") == "env" {
+				redisAddr = os.Getenv("REDIS_MASTER_SERVICE_HOST")
+			} else if os.Getenv("GET_HOSTS_FROM") == "dns" {
+				redisAddr = "redis-master"
+			}
+		}
 
-		instanceRedisCli.conn, err = redis.Dial("tcp", os.Getenv("YOUFIE_REDIS_ADDR"))
+		instanceRedisCli.conn, err = redis.Dial("tcp", redisAddr+":6379")
 
 		if err != nil {
 			panic(err)
