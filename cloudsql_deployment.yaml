@@ -10,10 +10,10 @@ spec:
         app: youfie-frontend
     spec:
       containers:
-        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:latest
+        - image: gcr.io/youfie-983ce/github-trevorprater-youfie-api-2:master
           name: web
           env:
-            - name: YOUFIE_DB_HOST
+            - name: YOUFIE_DB_ADDR
               # Connect to the SQL proxy over the local network on a fixed port.
               # Insert the port number used by your database. 
               value: 127.0.0.1:5432
