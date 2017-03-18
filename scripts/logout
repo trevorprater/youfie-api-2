@@ -1,1 +1,1 @@
-curl -i -H "Authorization: Bearer $1" -H "Accept: application/json" -H "Content-Type: application/json"  -XPOST http://localhost:5000/users/trevor/logout
+curl -i -H "Authorization: Bearer $1" -H "Accept: application/json" -H "Content-Type: application/json"  -XPOST https://youfie.io/api/v1/users/trevor/logout/

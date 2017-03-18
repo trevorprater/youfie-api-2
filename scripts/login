@@ -1,1 +1,1 @@
-curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"password": "venice"}' http://localhost:5000/users/trevor/login
+curl -Lvvv -H "Accept: application/json" -H "Content-Type: application/json" -XPOST -d '{"password": "venice"}' https://youfie.io/api/v1/users/trevor/login/
