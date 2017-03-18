@@ -81,6 +81,7 @@ func Login(rw http.ResponseWriter, r *http.Request) {
 	decoder.Decode(&requestUser)
 	requestUser.DisplayName = vars["display_name"]
 
+	log.Println(requestUser.Password)
 	responseStatus, token := services.Login(requestUser)
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(responseStatus)
