@@ -39,16 +39,16 @@ MATCH = {
 
 
 def create_match(display_name, match, session):
-    return session.post(API_URL + '/users/{}/matches'.format(display_name),
+    return session.post(API_URL + '/users/{}/matches/'.format(display_name),
                         data=json.dumps(match))
 
 
 def get_matches(display_name, session):
-    return session.get(API_URL + '/users/{}/matches'.format(display_name))
+    return session.get(API_URL + '/users/{}/matches/'.format(display_name))
 
 
 def get_potential_matches(display_name, session):
-    return session.get(API_URL + '/users/{}/matches'.format(display_name),
+    return session.get(API_URL + '/users/{}/matches/'.format(display_name),
                        params={'user_acknowledged': False})
 
 
@@ -59,69 +59,69 @@ def get_match(display_name, match_id, session):
 
 def update_match(display_name, match_id, updates, session):
     return session.put(
-        API_URL + '/users/{}/matches/{}'.format(display_name, match_id),
+        API_URL + '/users/{}/matches/{}/'.format(display_name, match_id),
         data=json.dumps(updates))
 
 
 def delete_match(display_name, match_id, session):
-    return session.delete(API_URL + '/users/{}/matches/{}'.format(display_name,
+    return session.delete(API_URL + '/users/{}/matches/{}/'.format(display_name,
                                                                   match_id))
 
 
 def create_face(display_name, photo_id, face, session):
     return session.post(
-        API_URL + '/users/{}/photos/{}/faces'.format(display_name, photo_id),
+        API_URL + '/users/{}/photos/{}/faces/'.format(display_name, photo_id),
         data=json.dumps(face))
 
 
 def get_faces(display_name, photo_id, session):
-    return session.get(API_URL + '/users/{}/photos/{}/faces'.format(
+    return session.get(API_URL + '/users/{}/photos/{}/faces/'.format(
         display_name, photo_id))
 
 
 def get_face(display_name, photo_id, face_id, session):
-    return session.get(API_URL + '/users/{}/photos/{}/faces/{}'.format(
+    return session.get(API_URL + '/users/{}/photos/{}/faces/{}/'.format(
         display_name, photo_id, face_id))
 
 
 def update_face(display_name, photo_id, face_id, updates, session):
-    return session.put(API_URL + '/users/{}/photos/{}/faces/{}'.format(
+    return session.put(API_URL + '/users/{}/photos/{}/faces/{}/'.format(
         display_name, photo_id, face_id),
                        data=json.dumps(updates))
 
 
 def delete_face(display_name, photo_id, face_id, session):
-    return session.delete(API_URL + '/users/{}/photos/{}/faces/{}'.format(
+    return session.delete(API_URL + '/users/{}/photos/{}/faces/{}/'.format(
         display_name, photo_id, face_id))
 
 
 def create_photo(display_name, photo, session):
-    return session.post(API_URL + '/users/{}/photos'.format(display_name),
+    return session.post(API_URL + '/users/{}/photos/'.format(display_name),
                         data=json.dumps(photo))
 
 
 def get_photos(display_name, session):
-    return session.get(API_URL + '/users/{}/photos'.format(display_name))
+    return session.get(API_URL + '/users/{}/photos/'.format(display_name))
 
 
 def get_photo(display_name, photo_id, session):
-    return session.get(API_URL + '/users/{}/photos/{}'.format(display_name,
+    return session.get(API_URL + '/users/{}/photos/{}/'.format(display_name,
                                                               photo_id))
 
 
 def update_photo(display_name, photo_id, updates, session):
     return session.put(
-        API_URL + '/users/{}/photos/{}'.format(display_name, photo_id),
+        API_URL + '/users/{}/photos/{}/'.format(display_name, photo_id),
         data=json.dumps(updates))
 
 
 def delete_photo(display_name, photo_id, session):
-    return session.delete(API_URL + '/users/{}/photos/{}'.format(display_name,
+    return session.delete(API_URL + '/users/{}/photos/{}/'.format(display_name,
                                                                  photo_id))
 
 
 def login(display_name, pw):
-    r = requests.post(API_URL + '/users/{}/login'.format(display_name),
+    r = requests.post(API_URL + '/users/{}/login/'.format(display_name),
                       data=json.dumps({
                           'password': pw
                       }))
@@ -135,11 +135,11 @@ def login(display_name, pw):
 
 
 def logout_user(display_name, session):
-    return session.post(API_URL + '/users/{}/logout'.format(display_name))
+    return session.post(API_URL + '/users/{}/logout/'.format(display_name))
 
 
 def create_user(display_name, email, password):
-    r = requests.post(API_URL + '/users',
+    r = requests.post(API_URL + '/users/',
                       data=json.dumps({
                           'password': password,
                           'display_name': display_name,
@@ -149,17 +149,17 @@ def create_user(display_name, email, password):
 
 
 def delete_user(display_name, session):
-    r = session.delete(API_URL + '/users/{}'.format(display_name))
+    r = session.delete(API_URL + '/users/{}/'.format(display_name))
     return r
 
 
 def update_user(display_name, updates, session):
-    return session.put(API_URL + '/users/{}'.format(display_name),
+    return session.put(API_URL + '/users/{}/'.format(display_name),
                        data=json.dumps(updates))
 
 
 def get_user(display_name, session):
-    return session.get(API_URL + '/users/{}'.format(display_name))
+    return session.get(API_URL + '/users/{}/'.format(display_name))
 
 
 def delete_user_if_exists(display_name, password):
