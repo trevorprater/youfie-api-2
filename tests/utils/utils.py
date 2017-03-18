@@ -3,7 +3,7 @@ import requests
 import json
 import random
 
-API_URL = 'http://localhost:5000'
+API_URL = 'https://youfie.io/api/v1'
 TEST_USER = 'trevor'
 TEST_USER_PW = 'venice'
 
